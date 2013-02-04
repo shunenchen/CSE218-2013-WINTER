@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [compojure "1.1.5"]
                  [ring/ring-jetty-adapter "1.1.0"]
+                 [ring-json-response "0.2.0"]
                  [environ "0.3.0"]]
   :min-lein-version "2.0.0"
   :main hgm.core)
