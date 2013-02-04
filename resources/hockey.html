@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Hockey Tracker</title>
 <link rel="stylesheet" href="master.css" type="text/css" media="screen" />
-
+<script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
 <script type="text/javascript">
 function StartTime(id,srt){
  var obj=document.getElementById(id),ms=obj.value.split(/\W/);
@@ -61,6 +61,17 @@ function SelectPlayer(player, team){
 		obj.className = "unselected";
 	}
 }
+
+function getForwards() {
+  $.getJSON("/teams/foo/get-forwards", function(data) {
+    $.each(data.data, function(key, val) {
+console.log(key);
+      $("#home"+(key+1)).attr("value", val);
+    });
+  });
+}
+
+$(getForwards);
 </script>
 <h1>Hockey Tracker</h1>
 </head>

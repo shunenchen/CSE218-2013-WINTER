@@ -4,4 +4,4 @@
 (defn get-forwards
   "FIXME: do something useful"
   [team]
-  ["John" "Eric" "Ben"])
+  (apply concat (repeat 4 ["John" "Eric" "Ben"])))
