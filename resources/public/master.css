@@ -1,0 +1,230 @@
+@charset "utf-8";
+/* CSS Document */
+
+/*------------------------------
+=BASIC SETUP
+------------------------------*/
+
+/* Makeshift CSS Reset */
+* {
+	margin: 0;
+	padding: 0;
+}
+
+/* Tell the browser to render HTML 5 elements as block */
+header, footer, section, aside, nav, article {
+	display: block;
+}
+
+body {
+	margin: 0 auto;
+	padding: 22px 0;
+	width: 550px;
+	font: 13px/22px Helvetica, Arial, sans-serif;
+	background: #F0F0F0;
+}
+
+h1, h2 {
+	font-size: 28px;
+	line-height: 44px;
+	padding: 22px 0;
+    text-align: center;
+}
+
+h3 {
+	font-size: 18px;
+	line-height: 22px;
+	padding: 11px 0;
+}
+
+p {
+	padding-bottom: 22px;
+}
+
+
+
+
+/*------------------------------
+=NAVIGATION
+------------------------------*/
+
+nav {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	background: #222222;
+}
+	nav div {
+		display: table;
+		margin: 0 auto;
+		padding: 44px 0;
+		width: 500px;
+		color: #777;
+	}
+
+	nav ul {
+		margin: 0 auto;
+		width: 500px;
+		list-style: none;
+	}
+
+		nav ul li {
+			float: left;
+		}
+		
+			nav ul li a {
+				display: block;
+				width: 216px;
+				font-size: 14px;
+				line-height: 44px;
+				text-align: center;
+				text-decoration: none;
+				color: #777;
+			}
+			
+				nav ul li a:hover {
+	color: #fff;
+				}
+			
+			nav ul li.selected a {
+				color: #fff;
+			}
+
+
+/*------------------------------
+=CONTENT AREA AND SIDEBAR LAYOUT
+------------------------------*/
+
+#content {
+	display: table;
+}
+
+	#mainContent {
+		display: table-cell;
+		width: 500px;
+		padding-right: 22px;
+		padding left:  22px;
+	}
+		#mainContent button {
+			width: 35px;
+		}
+
+/*------------------------------
+=TIMER
+------------------------------*/
+
+#timer {
+	float: right;
+}
+	#timer input[type=text] {
+		width: 70px;
+		vertical-align:bottom;
+		height: 35px;
+		font-size:25px
+	}
+
+	#timer input[type=button] {
+		width:5em;
+		height:3em;
+		background-color: #A9A9A9;
+	}
+		#timer input[type=button].selected {
+			width:5em;
+			height:3em;
+			background-color: #FFFFFF;
+		}
+
+/*------------------------------
+=HOMETEAM style="background-color:#EEEEEE;height:400px;width:400px;float:left;"
+------------------------------*/
+
+#hometeam {
+	float:left;
+	height:400px;
+	width:225px;
+	text-align:center;
+}
+	#hometeam input[type=button] {
+		width:5em;
+		height:3em;
+		background-color: #A9A9A9;
+	}
+		#hometeam input[type=button].selected {
+			width:5em;
+			height:3em;
+			background-color: #FFFFFF;
+		}
+	
+		
+/*------------------------------
+=AWAYTEAM style="background-color:#777777;height:400px;width:400px;float:left;"
+------------------------------*/
+
+#awayteam {
+	float:right;
+	width:225px;
+	height:400px;
+	text-align:center;
+}
+
+	#awayteam input[type=button] {
+		width:5em;
+		height:3em;
+		background-color: #A9A9A9;
+	}
+
+		#awayteam input[type=button].selected {
+			width:5em;
+			height:3em;
+			background-color: #FFFFFF;
+		}
+
+/*------------------------------
+=FOOTER
+------------------------------*/
+footer {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	background: #222222;
+}
+
+	footer div {
+		display: table;
+		margin: 0 auto;
+		padding: 44px 0;
+		width: 650px;
+		color: #777;
+	}
+	
+		footer div section {
+			display: table-cell;
+			width: 315px;
+		}
+		
+	footer h3 {
+		color: #FFF;
+	}
+	
+	footer a {
+		color: #999;
+	}
+	
+		footer a:hover {
+			color: #FFF;
+			text-decoration: none;
+		}
+	
+	footer ul {
+		margin: 0 0 0 40px;
+		list-style: square;
+		color: #565656;
+	}
+	
+		footer ul li a {
+			display: block;
+		}
+		
+	footer img {
+		margin: 0 0 0 30px;
+	}
