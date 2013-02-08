@@ -7,6 +7,11 @@
                  [compojure "1.1.5"]
                  [ring/ring-jetty-adapter "1.1.0"]
                  [ring-json-response "0.2.0"]
-                 [environ "0.3.0"]]
+                 [environ "0.3.0"]
+				 [org.clojure/tools.logging "0.2.3"]
+                 [org.clojure/tools.trace "0.7.1"]
+                 [com.amazonaws/aws-java-sdk "1.3.27"]
+                 [commons-logging/commons-logging "1.1"]
+				 ]
   :min-lein-version "2.0.0"
   :main hgm.core)
