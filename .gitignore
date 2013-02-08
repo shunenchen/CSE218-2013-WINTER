@@ -15,3 +15,4 @@ pom.xml.asc
 *.swp
 *.DS_Store
 /.lein-git-deps
+/resources/aws.properties.clj
