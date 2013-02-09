@@ -34,9 +34,9 @@
   [team]
   (apply concat (repeat 4 ["John" "Eric" "Ben"])))
  
+(defn uuid [] (str (java.util.UUID/randomUUID)))
  
 (def ^{:dynamic true} *ddb_client*)
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;General stuff
@@ -496,26 +496,3 @@
                 (assoc options :exclusive_start_key (KeyObject->key (.getLastEvaluatedKey result))))
           )
         )))
-
-;;(def client (create-ddb-client {:access_key "AKIAI7J756UQ3EIME66A"
-;;                             :secret_key "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"}))
-;;
-;;(def test-Table "GameClock")
-;;(with-client client
-;;	(create-table
-;;		"GameClock"
-;;        {:read_units 2 :write_units 2}
-;;        {:name "TimeStamp-Game-Event-Number" :type :string}
-;;		{:name "Event-Number"				  :type :number}
-;;    )
-;;)
-;;
-;;(with-client client
-;;    (list-tables))
-;;	
-;;(with-client client
-;;      (put-item "GameClock" {:TimeStamp-Game-Event-Number "2013-02-03-BA-SF-1830PM" :Event-Number 0000 :Event "FaceOff @ 210:00"}))
-;;	  
-;;(with-client client
-;;      (put-item "GameClock" {:TimeStamp-Game-Event-Number "2013-02-03-BA-SF-1830PM" :Event-Number 0001 :Event "Cameron H. Scored@ 14:39"}))
-
