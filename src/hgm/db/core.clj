@@ -28,15 +28,22 @@
            ScanRequest
            UpdateItemRequest]))
 
-;;; DB CODE GOES HERE
-(defn get-forwards
-  "FIXME: do something useful"
-  [team]
-  (apply concat (repeat 4 ["John" "Eric" "Ben"])))
- 
+		   
 (defn uuid [] (str (java.util.UUID/randomUUID)))
+
+ 
+(defn uuidInt []
+  "Take UUID and make it a number"
+ (read-string 
+  (str "0x" (apply str (filter #(#{\a,\b,\c,\d,\e,\f,\1,\2,\3,\4,\5,\6,\7,\8,\9} %) (uuid))))))
+
  
 (def ^{:dynamic true} *ddb_client*)
+
+(def playerTable   "Player_Table")
+(def teamTable     "Team_Table")
+(def pastGameTable "Past_Game_Table")
+(def liveGameTable "Live_Game_Table")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;General stuff
@@ -496,3 +503,40 @@
                 (assoc options :exclusive_start_key (KeyObject->key (.getLastEvaluatedKey result))))
           )
         )))
+		
+;;; DB CODE GOES HERE
+(defn get-forwards
+  "FIXME: do something useful"
+  [team]
+  (apply concat (repeat 4 ["John" "Eric" "Ben"])))
+
+;;TODO: Stripped down the necessary information only and add the client credential
+;(defn get-forwards-test
+;  [team]
+;  (with-client client
+;	(query playerTable team {:range_condition [:BEGINS_WITH "F_"]}))
+;)
+;
+;(defn get-defense
+;  [team]
+;  (with-client client
+;	(query playerTable team {:range_condition [:BEGINS_WITH "D_"]}))
+;)
+;
+;(defn get-goalie
+;  [team]
+;  (with-client client
+;	(query playerTable team {:range_condition [:BEGINS_WITH "G_"]}))
+;)
+;
+;;Example
+;;(add-gameEvents "2012-02-07-07:30PM-LA-SD" "62:00_" "A Lineup Change to : SD_F00, SD_F01, ;SD_F02 , SD_F03 , SD_G00" "San Diego")
+;(defn add-gameEvents
+;  [gameID gameClock gameEvent teamInovled]
+;  (with-client client
+;      (put-item liveGameTable 
+;	  {:game_ID gameID :game_clock_game_event_ID (str gameClock (uuid)) 
+;		:event gameEvent  :team teamInovled }
+;		)
+;	)
+;)

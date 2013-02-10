@@ -50,8 +50,6 @@
         {:name "hash" :type :number}
         {:name "range" :type :number})
       ) (catch Exception e ()))
-
-
   )
 
 
