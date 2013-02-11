@@ -41,7 +41,8 @@
         var authorizeButton = document.getElementById('authorize-button');
         if (authResult && !authResult.error) {
           authorizeButton.style.visibility = 'hidden';
-          makeApiCall();
+		  var token = authResult.access_token;
+          makeApiCall(token);
         } else {
           authorizeButton.style.visibility = '';
           authorizeButton.onclick = handleAuthClick;
@@ -54,7 +55,7 @@
       }
 
       // Load the API and make an API call.  Display the results on the screen.
-      function makeApiCall() {
+      function makeApiCall(token) {
         gapi.client.load('plus', 'v1', function() {
           var request = gapi.client.plus.people.get({
             'userId': 'me'
@@ -65,8 +66,8 @@
             image.src = resp.image.url;
             heading.appendChild(image);
             heading.appendChild(document.createTextNode(resp.displayName));
-			heading.appendChild(document.createTextNode(" has logged in... should redirect to main app after starting session from backend."));
-
+			heading.appendChild(document.createTextNode(" has logged in... should redirect to main app after starting session from backend with access token = "));
+			heading.appendChild(document.createTextNode(token));
             document.getElementById('content').appendChild(heading);
           });
         });
