@@ -17,6 +17,10 @@
   (GET  "/teams/:team/get-goalies"  [team] (api/get-goalies  team))
   (GET  "/teams/:team/get-roster"   [team] (api/get-roster   team))
 
+  (GET  "/users"                    []     (api/get-users))
+  (PUT  "/users/:user"              [user permissions]
+        (api/update-user user permissions))
+
   (POST "/events/start-game"        [home away]
         (api/add-start-game-event home away))
 

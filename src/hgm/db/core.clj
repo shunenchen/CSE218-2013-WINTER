@@ -21,6 +21,15 @@
   [team]
   (concat (get-forwards team) (get-defense team) (get-goalies team)))
 
+(defn get-users
+  []
+  ["Eric" "Ben"])
+
+(defn update-user
+  "FIXME: do something useful"
+  [user permissions]
+  [user permissions])
+
 (defn add-gameEvents
   "FIXME: do something useful"
   [gameId time & rest]

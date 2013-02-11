@@ -39,6 +39,15 @@
   [team]
   (db/get-roster team))
 
+(defapi get-users
+  "Get a list of all users in the system."
+  []
+  (db/get-users))
+
+(defapi update-user
+  "Update a user with some attributes."
+  [user permissions]
+  (db/update-user user permissions))
 
 ;;; the add-X-event functions are stubs and do not reflect an actual api...
 (defapi add-start-game-event
