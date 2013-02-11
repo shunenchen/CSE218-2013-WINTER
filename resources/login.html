@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Hockey Game Manager</title>
+<meta charset="UTF-8" />
+<link rel="stylesheet" type="text/css" href="public/auth_reset.css">
+<link rel="stylesheet" type="text/css" href="public/auth_structure.css">
+</head>
+
+<body>
+<form class="box login">
+	<fieldset class="boxBody">
+	  <label>Login using Google+</label>	  
+	</fieldset>
+	<footer>	  
+      <button id="authorize-button" class="btnLogin" style="visibility: visible">Login</button>
+	  <!--<input type="submit" class="btnLogin" value="Login" tabindex="4">-->
+	</footer>
+</form>
+<footer id="main">
+  Hockey Game Manager | CSE 218
+</footer>
+
+<script type="text/javascript">     
+      var clientId = '606098542125.apps.googleusercontent.com';
+      var apiKey = 'AIzaSyAZ_Xz8QcMKH6IrM-7EcsQkBSQV5kkpm3A';
+      var scopes = 'https://www.googleapis.com/auth/plus.me';
+
+      // Use a button to handle authentication the first time.
+      function handleClientLoad() {
+        gapi.client.setApiKey(apiKey);
+        window.setTimeout(checkAuth,1);
+      }
+
+      function checkAuth() {
+        gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: true}, handleAuthResult);
+      }
+
+
+      function handleAuthResult(authResult) {
+        var authorizeButton = document.getElementById('authorize-button');
+        if (authResult && !authResult.error) {
+          authorizeButton.style.visibility = 'hidden';
+          makeApiCall();
+        } else {
+          authorizeButton.style.visibility = '';
+          authorizeButton.onclick = handleAuthClick;
+        }
+      }
+
+      function handleAuthClick(event) {
+        gapi.auth.authorize({client_id: clientId, scope: scopes, immediate: false}, handleAuthResult);
+        return false;
+      }
+
+      // Load the API and make an API call.  Display the results on the screen.
+      function makeApiCall() {
+        gapi.client.load('plus', 'v1', function() {
+          var request = gapi.client.plus.people.get({
+            'userId': 'me'
+          });
+          request.execute(function(resp) {
+            var heading = document.createElement('h4');
+            var image = document.createElement('img');
+            image.src = resp.image.url;
+            heading.appendChild(image);
+            heading.appendChild(document.createTextNode(resp.displayName));
+			heading.appendChild(document.createTextNode(" has logged in... should redirect to main app after starting session from backend."));
+
+            document.getElementById('content').appendChild(heading);
+          });
+        });
+      }
+    </script>
+<script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+    
+    <div id="content"></div>
+</body>
+</html>
