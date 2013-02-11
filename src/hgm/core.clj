@@ -18,8 +18,8 @@
   (GET  "/teams/:team/get-roster"   [team] (api/get-roster   team))
 
   (GET  "/users"                    []     (api/get-users))
-  (PUT  "/users/:user"              [user permissions]
-        (api/update-user user permissions))
+  (PUT  "/users/:user"              [user roles]
+        (api/update-user user roles))
 
   (POST "/events/start-game"        [home away]
         (api/add-start-game-event home away))

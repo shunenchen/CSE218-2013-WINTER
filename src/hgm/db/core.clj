@@ -27,8 +27,8 @@
 
 (defn update-user
   "FIXME: do something useful"
-  [user permissions]
-  [user permissions])
+  [user roles]
+  [user roles])
 
 (defn add-gameEvents
   "FIXME: do something useful"

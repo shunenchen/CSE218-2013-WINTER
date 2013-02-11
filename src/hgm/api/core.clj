@@ -46,8 +46,8 @@
 
 (defapi update-user
   "Update a user with some attributes."
-  [user permissions]
-  (db/update-user user permissions))
+  [user roles]
+  (db/update-user user roles))
 
 ;;; the add-X-event functions are stubs and do not reflect an actual api...
 (defapi add-start-game-event
