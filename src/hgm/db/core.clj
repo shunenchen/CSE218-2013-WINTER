@@ -21,14 +21,27 @@
   [team]
   (concat (get-forwards team) (get-defense team) (get-goalies team)))
 
+(def users (atom {}))
+
 (defn get-users
   []
-  ["Eric" "Ben"])
+  (vec (vals @users)))
+
+(defn get-user
+  [id]
+  (@users id))
+
+(defn create-user
+  [m]
+  ((swap! users assoc (:identity m)
+          (assoc m :roles #{:user}))
+   (:identity m)))
 
 (defn update-user
   "FIXME: do something useful"
   [user roles]
-  [user roles])
+  ((swap! users update-in [user] assoc :roles roles)
+   user))
 
 (defn add-gameEvents
   "FIXME: do something useful"
