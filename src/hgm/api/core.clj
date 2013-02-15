@@ -19,25 +19,25 @@
           (catch java.lang.Throwable t# {:status 500 :body (.getMessage t#)}))))
 
 
-(defapi get-forwards
+(defapi get-forwards-names
   "Get a list of all forwards in `team'."
   [team]
-  (db/get-forwards team))
+  (db/get-forwards-names team))
 
-(defapi get-defense
+(defapi get-defenders-names
   "Get a list of all defense in `team'."
   [team]
-  (db/get-defense team))
+  (db/get-defenders-names team))
 
-(defapi get-goalies
+(defapi get-goalies-names
   "Get a list of all goalies in `team'."
   [team]
-  (db/get-goalies team))
+  (db/get-goalies-names team))
 
-(defapi get-roster
+(defapi get-roster-names
   "Get the roster of `team'."
   [team]
-  (db/get-roster team))
+  (db/get-roster-names team))
 
 (defapi get-users
   "Get a list of all users in the system."

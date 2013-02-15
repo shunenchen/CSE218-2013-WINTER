@@ -497,38 +497,56 @@
 		
 ;;; DB CODE GOES HERE
 
-(defn get-forwards
-  "FIXME: do something useful"
-  [team]
-  (apply concat (repeat 4 ["John" "Eric" "Ben"])))
 (def properties {:access_key (System/getenv "DYNAMODB_ACCESS_KEY") :secret_key (System/getenv "DYNAMODB_SECRET_KEY")})
 (def cred (select-keys properties [:access_key :secret_key]))
 (def client (create-ddb-client cred))
-(def cred (select-keys properties [:access_key :secret_key]))
 
 (def playerTable   "Player_Table")
 (def teamTable     "Team_Table")
 (def pastGameTable "Past_Game_Table")
 (def liveGameTable "Live_Game_Table")
 
+(defn get-players-attribute
+  [players attribute]
+  (for
+    [p players]
+    (val (find p attribute))))
 
-(defn get-forward
+(defn get-forwards
   [team]
   (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "F_"]}))
-)
+	(query playerTable team {:range_condition [:BEGINS_WITH "F_"]})))
 
-(defn get-defense
+(defn get-defenders
   [team]
   (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "D_"]}))
-)
+	(query playerTable team {:range_condition [:BEGINS_WITH "D_"]})))
 
-(defn get-goalie
+(defn get-goalies
   [team]
   (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "G_"]}))
-)
+	(query playerTable team {:range_condition [:BEGINS_WITH "G_"]})))
+
+(defn get-roster
+ [team]
+  (with-client client
+         (query playerTable team {})))
+
+(defn get-forwards-names
+    [team]
+    (get-players-attribute (get-forwards team) :player_name))
+
+(defn get-defenders-names
+    [team ]
+    (get-players-attribute (get-defenders team) :player_name))
+
+(defn get-goalies-names
+    [team ]
+    (get-players-attribute (get-goalies team) :player_name))
+
+(defn get-roster-names
+    [team ]
+    (get-players-attribute (get-roster team) :player_name))
 
 (defn add-gameEvents
   [gameID gameClock gameEvent teamInovled]
@@ -550,21 +568,6 @@
 ;		)
 ;	)
 ;)
-
-(defn get-defense
-  "FIXME: do something useful"
-  [team]
-  (apply concat (repeat 3 ["Sam" "Cam"])))
-
-(defn get-goalies
-  "FIXME: do something useful"
-  [team]
-  ["David" "David"])
-
-(defn get-roster
-  "FIXME: do something useful"
-  [team]
-  (concat (get-forwards team) (get-defense team) (get-goalies team)))
 
 (def users (atom {}))
 
@@ -588,21 +591,16 @@
   ((swap! users update-in [user] assoc :roles roles)
    user))
 
-(defn add-gameEvents
+(defn add-gameEvent
   "FIXME: do something useful"
-  [gameId time & rest]
+  [gameId time eventType & details]
   {:gameId gameId
    :time time
-   :rest rest})
+   :eventType eventType
+   :details details})
 
 (defn create-game
   "FIXME: do something useful"
   [home away]
   "XXXX-XXXX-XXXX-XXXX")
-
-(defn query
-  "FIXME: do something useful"
-  [home away]
-  (if (= home "foo")
-    {:uuid "YYYY-YYYY-YYYY-YYYY"}))
 
