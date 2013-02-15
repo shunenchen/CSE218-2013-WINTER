@@ -553,10 +553,17 @@
   (with-client client
       (put-item liveGameTable 
 	  {:game_ID gameID :game_clock_game_event_type_and_ID (str gameClock "_" eventType "_" (uuid)) 
-		:event gameEvent  :team teamInovled }
+		:event gameEvent  :team teamInovled :event_type eventType}
 		)
 	)
 )
+
+;(query-on-eventType "2012-02-07-07:30PM-LA-SD" "Lineup Change") 
+(defn query-on-eventType [gameID eventType]
+  (filter #(= (:event_type %) eventType) (with-client client
+         (query liveGameTable gameID {})))
+	)
+
 ;(add-gameEvent "2012-02-07-07:30PM-LA-SD" "0:01:23.1234" "Penalty" "Hook: John Magnan, #43" "San Diego")
 
 (def users (atom {}))
