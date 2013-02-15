@@ -15,7 +15,7 @@
                            (throw (Exception. (str "missing argument: " s#)))))
                        ~@body)]
             {:status 200
-             :body {:data r#}})
+             :body (if (map? r#) r# {:data r#})})
           (catch java.lang.Throwable t# {:status 500 :body (.getMessage t#)}))))
 
 
