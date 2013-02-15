@@ -581,6 +581,11 @@
   ((swap! users update-in [user] assoc :roles roles)
    user))
 
+(defn game-id
+  [year month day time awayTeam homeTeam]
+  (str year \_ (format "%02d" month) \_ (format "%02d" day) \_ time \_ awayTeam \@ homeTeam))
+
+
 (defn create-game
   "FIXME: do something useful"
   [home away]
