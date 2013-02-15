@@ -38,6 +38,7 @@ function StartTime(id,srt){
                 startingPlayers: [] }
     }, function (data) {
         GAME_ID = data.gameId;
+        console.log('GAME_ID: ' + GAME_ID);
     });
     var obj=document.getElementById(id),ms=obj.value.split(/\W/);
     if (StartTime[id]){
@@ -114,7 +115,7 @@ function SelectPlayer(player, team){
                                 time: time,
                                 outPlayer: outPlayer,
                                 inPlayer: obj.value
-                            });
+                            }).done(function(data){console.log(data);});;
 			}
 			else { //The first time all the players have been on the ice
 				console.log(obj);
@@ -151,7 +152,7 @@ function AwayShot(div, id) {
         gameId: GAME_ID,
         time: shotTime,
         player: player
-    });
+    }).done(function(data) {console.log(data);});
     console.log("Away Shot");
     console.log(player);
     console.log(shotTime);
@@ -165,7 +166,7 @@ function HomeShot(div, id) {
         gameId: GAME_ID,
         time: shotTime,
         player: player
-    });
+    }).done(function(data) {console.log(data);});;
     console.log("Home Shot");
     console.log(player);
     console.log(shotTime);
