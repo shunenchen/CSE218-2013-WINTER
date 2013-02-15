@@ -27,26 +27,36 @@ function Queue(){
 	};
 };
 
+var GAME_ID;
+
 //Game Timer Functions
 function StartTime(id,srt){
-	var obj=document.getElementById(id),ms=obj.value.split(/\W/);
-	if (StartTime[id]){
-		clearTimeout(StartTime[id].to);
-	}
-	if (srt&&isFinite(ms[0])&&isFinite(ms[1])){
-		StartTime[id]={
-		obj:obj,
+    $.post("/events/start-game", {
+        home: { teamId: "XXXX-XXXX-XXXX-XXXX",
+                startingPlayers: [] },
+        away: { teamId: "YYYY-YYYY-YYYY-YYYY",
+                startingPlayers: [] }
+    }, function (data) {
+        GAME_ID = data.gameId;
+    });
+    var obj=document.getElementById(id),ms=obj.value.split(/\W/);
+    if (StartTime[id]){
+	clearTimeout(StartTime[id].to);
+    }
+    if (srt && isFinite(ms[0]) && isFinite(ms[1])){
+	StartTime[id]={
+	    obj:obj,
 		srt:new Date(),
-		time:ms[0]*60+ms[1]*1
-	}
+	    time:ms[0]*60+ms[1]*1
+	};
 	Tick(StartTime[id]);
-	}
+    }
 }
 function Tick(o){
 	var now=Math.floor(o.time-(new Date()-o.srt)/1000);
 	if (now>=0){
-		o.obj.value=Nu(Math.floor(now/60))+':'+Nu(now%60);
-		o.to=setTimeout(function(){ Tick(o); },1000)
+	    o.obj.value=Nu(Math.floor(now/60))+':'+Nu(now%60);
+	    o.to=setTimeout(function(){ Tick(o); },1000);
 	}
 }
 function Nu(nu){
@@ -72,11 +82,17 @@ function SelectPlayer(player, team){
 	if (obj.className == "unselected"){
 		if (team == "home" && homeselected <= 5){
 			if (!homeQueue.isEmpty()){
-				var outPlayer = homeQueue.dequeue();
-				//send outplayer and 'inplayer'
-				console.log(time);	//time the switch occured
-				console.log(outPlayer);	//player leaving the ice
-				console.log(obj);	//player entering the ice
+			    var outPlayer = homeQueue.dequeue();
+			    //send outplayer and 'inplayer'
+			    console.log(time);	//time the switch occured
+			    console.log(outPlayer);	//player leaving the ice
+			    console.log(obj);	//player entering the ice
+                            $.post("/events/swap-players", {
+                                gameId: GAME_ID,
+                                time: time,
+                                outPlayer: outPlayer,
+                                inPlayer: obj.value
+                            }).done(function(data){console.log(data);});
 			}
 			else { //The first time all the players have been on the ice
 				console.log(obj);
@@ -88,11 +104,17 @@ function SelectPlayer(player, team){
 		}
 		if (team == "away" && awayselected <= 5){
 			if (!awayQueue.isEmpty()){
-				var outPlayer = awayQueue.dequeue();
-				//send outplayer and 'inplayer'
-				console.log(time);	//time the switch occured
-				console.log(outPlayer);	//player leaving the ice
-				console.log(obj);	//player entering the ice
+			    var outPlayer = awayQueue.dequeue();
+			    //send outplayer and 'inplayer'
+			    console.log(time);	//time the switch occured
+			    console.log(outPlayer);	//player leaving the ice
+			    console.log(obj);	//player entering the ice
+                            $.post("/events/swap-players", {
+                                gameId: GAME_ID,
+                                time: time,
+                                outPlayer: outPlayer,
+                                inPlayer: obj.value
+                            });
 			}
 			else { //The first time all the players have been on the ice
 				console.log(obj);
@@ -104,12 +126,12 @@ function SelectPlayer(player, team){
 	}
 	else {
 		if (team == "away"){
-			awayselected -= 1;
-			awayQueue.enqueue(obj)
+		    awayselected -= 1;
+		    awayQueue.enqueue(obj.value);
 		}
 		else {
-			homeselected -= 1;
-			homeQueue.enqueue(obj)
+		    homeselected -= 1;
+		    homeQueue.enqueue(obj.value);
 		}
 		obj.className = "unselected";
 	}
@@ -123,21 +145,31 @@ function shot(div){
 }
 
 function AwayShot(div, id) {
-	popup(div);
-	var player = document.getElementById(id).value;
-	console.log("Away Shot");
-	console.log(player);
-	console.log(shotTime);
-	document.getElementById(id).value = "";
+    popup(div);
+    var player = document.getElementById(id).value;
+    $.post("/events/shot", {
+        gameId: GAME_ID,
+        time: shotTime,
+        player: player
+    });
+    console.log("Away Shot");
+    console.log(player);
+    console.log(shotTime);
+    document.getElementById(id).value = "";
 }
 
 function HomeShot(div, id) {
-	popup(div);
-	var player = document.getElementById(id).value;
-	console.log("Home Shot");
-	console.log(player);
-	console.log(shotTime);
-	document.getElementById(id).value = "";
+    popup(div);
+    var player = document.getElementById(id).value;
+    $.post("/events/shot", {
+        gameId: GAME_ID,
+        time: shotTime,
+        player: player
+    });
+    console.log("Home Shot");
+    console.log(player);
+    console.log(shotTime);
+    document.getElementById(id).value = "";
 }
 
 //Function to get the forwards that should be on the ice.

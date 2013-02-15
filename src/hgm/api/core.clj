@@ -62,7 +62,7 @@
 (defapi add-swap-players-event
   "Swap two players during a game."
   [gameId time outPlayer inPlayer]
-  (db/add-gameEvents gameId time))
+  (db/add-gameEvents gameId time "swap" outPlayer inPlayer))
 
 (defapi add-end-game-event
   "End a game."

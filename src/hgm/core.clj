@@ -19,7 +19,7 @@
 
 (defroutes hgm-routes
   (GET  "/" request (io/file (if (friend/authorized?
-                                  #{:admin}
+                                  #{:official}
                                   friend/*identity*)
                           "resources/hockey.html"
                           "resources/login.html")))
