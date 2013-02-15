@@ -548,26 +548,16 @@
     [team ]
     (get-players-attribute (get-roster team) :player_name))
 
-(defn add-gameEvents
-  [gameID gameClock gameEvent teamInovled]
+(defn add-gameEvent
+  [gameID gameClock eventType gameEvent teamInovled]
   (with-client client
       (put-item liveGameTable 
-	  {:game_ID gameID :game_clock_game_event_ID (str gameClock (uuid)) 
+	  {:game_ID gameID :game_clock_game_event_type_and_ID (str gameClock "_" eventType "_" (uuid)) 
 		:event gameEvent  :team teamInovled }
 		)
 	)
 )
-;;Example
-;;(add-gameEvents "2012-02-07-07:30PM-LA-SD" "62:00_" "A Lineup Change to : SD_F00, SD_F01, ;SD_F02 , SD_F03 , SD_G00" "San Diego")
-;(defn add-gameEvents
-;  [gameID gameClock gameEvent teamInovled]
-;  (with-client client
-;      (put-item liveGameTable 
-;	  {:game_ID gameID :game_clock_game_event_ID (str gameClock (uuid)) 
-;		:event gameEvent  :team teamInovled }
-;		)
-;	)
-;)
+;(add-gameEvent "2012-02-07-07:30PM-LA-SD" "0:01:23.1234" "Penalty" "Hook: John Magnan, #43" "San Diego")
 
 (def users (atom {}))
 
@@ -590,14 +580,6 @@
   [user roles]
   ((swap! users update-in [user] assoc :roles roles)
    user))
-
-(defn add-gameEvent
-  "FIXME: do something useful"
-  [gameId time eventType & details]
-  {:gameId gameId
-   :time time
-   :eventType eventType
-   :details details})
 
 (defn create-game
   "FIXME: do something useful"

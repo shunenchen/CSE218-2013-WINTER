@@ -56,20 +56,20 @@
   (if-let [game (db/query home away)]
     {:gameId (:uuid game)}
     (let [gameId (db/create-game home away)]
-      (db/add-gameEvents gameId 0 "on-ice")
+      (db/add-gameEvent gameId 0 "on-ice")
       {:gameId gameId})))
 
 (defapi add-swap-players-event
   "Swap two players during a game."
   [gameId time outPlayer inPlayer]
-  (db/add-gameEvents gameId time))
+  (db/add-gameEvent gameId time))
 
 (defapi add-end-game-event
   "End a game."
   [gameId time]
-  (db/add-gameEvents gameId time "end"))
+  (db/add-gameEvent gameId time "end"))
 
 (defapi add-shot-event
   "Add a shot event."
   [gameId time player]
-  (db/add-gameEvents gameId time "shot taken" player))
+  (db/add-gameEvent gameId time "shot taken" player))

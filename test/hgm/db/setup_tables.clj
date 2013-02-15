@@ -66,11 +66,11 @@
 )
 
 (def liveGame [
-{:game_ID "2012-02-07-07:30PM-LA-SD" :game_clock_game_event_ID (str "60:00_" (uuid)) 
+{:game_ID "2012-02-07-07:30PM-LA-SD" :game_clock_game_event_type_and_ID (str "00:00:00.0000_" "Game Start" "_" (uuid)) 
  :event "Game_Start"}
-{:game_ID "2012-02-07-07:30PM-LA-SD" :game_clock_game_event_ID (str "60:00_" (uuid)) 
+{:game_ID "2012-02-07-07:30PM-LA-SD" :game_clock_game_event_type_and_ID (str "00:00:00.0000_" "Lineup Change" "_" (uuid)) 
  :event "Lineup Change to : LA_F00, LA_F01, LA_F02 , LA_F03 , LA_G00" :team "Los Angeles" }
-{:game_ID "2012-02-07-07:30PM-LA-SD" :game_clock_game_event_ID (str "60:00_" (uuid)) 
+{:game_ID "2012-02-07-07:30PM-LA-SD" :game_clock_game_event_type_and_ID (str "00:00:00.0000_" "Lineup Change" "_" (uuid)) 
  :event "Lineup Change to : SD_F00, SD_F01, SD_F02 , SD_F03 , SD_G00" :team "San Diego" } ]
 )
 
