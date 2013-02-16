@@ -548,16 +548,20 @@
     [team ]
     (get-players-attribute (get-roster team) :player_name))
 
+(defn game-id
+  [year month day startTime awayTeam homeTeam]
+  (str year \_ (format "%02d" month) \_ (format "%02d" day) \_ startTime \_
+       awayTeam \@ homeTeam))
+
 (defn add-gameEvent
-  [gameID gameClock eventType gameEvent teamInovled]
+  [gameID gameClock gameEvent]
   (with-client client
       (put-item liveGameTable 
-	  {:game_ID gameID :game_clock_game_event_type_and_ID (str gameClock "_" eventType "_" (uuid)) 
-		:event gameEvent  :team teamInovled }
-		)
-	)
-)
-;(add-gameEvent "2012-02-07-07:30PM-LA-SD" "0:01:23.1234" "Penalty" "Hook: John Magnan, #43" "San Diego")
+	{ :game_ID gameID
+	  :game_clock_uuid (str gameClock \_ (uuid)) 
+          :event (str gameEvent)})))
+
+;(add-gameEvent (game-id 2012 2 7 19:30 "SD" "LD") "0:12:34.5678" {:type "Penalty" :name "John Mangan"})
 
 (def users (atom {}))
 
@@ -580,11 +584,6 @@
   [user roles]
   ((swap! users update-in [user] assoc :roles roles)
    user))
-
-(defn game-id
-  [year month day time awayTeam homeTeam]
-  (str year \_ (format "%02d" month) \_ (format "%02d" day) \_ time \_ awayTeam \@ homeTeam))
-
 
 (defn create-game
   "FIXME: do something useful"
