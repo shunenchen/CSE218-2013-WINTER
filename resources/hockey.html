@@ -1,3 +1,4 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -5,85 +6,31 @@
 <title>Hockey Tracker</title>
 <link rel="stylesheet" href="master.css" type="text/css" media="screen" />
 <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+<script type="text/javascript" src="popup.js"></script>
+<script type="text/javascript" src="gamefunctions.js"></script>
 <script type="text/javascript">
-function StartTime(id,srt){
- var obj=document.getElementById(id),ms=obj.value.split(/\W/);
- if (StartTime[id]){
-  clearTimeout(StartTime[id].to);
- }
- if (srt&&isFinite(ms[0])&&isFinite(ms[1])){
-  StartTime[id]={
-   obj:obj,
-   srt:new Date(),
-   time:ms[0]*60+ms[1]*1
-  }
-  Tick(StartTime[id]);
- }
-}
-
-function Tick(o){
- var now=Math.floor(o.time-(new Date()-o.srt)/1000);
- if (now>=0){
-  o.obj.value=Nu(Math.floor(now/60))+':'+Nu(now%60);
-  o.to=setTimeout(function(){ Tick(o); },1000)
- }
-}
-
-function Nu(nu){
- return (nu>9?'':'0')+nu;
-}
-
-function ResetTime(id){
-	document.getElementById(id).value = "20:00";
-}
-
-var homeselected = 0;
-var awayselected = 0;
-function SelectPlayer(player, team){
-	var obj = document.getElementById(player);
-	if (obj.className == "unselected"){
-		if (team == "home" && homeselected <= 5){
-			obj.className = "selected";
-			homeselected += 1;
-		}
-		if (team == "away" && awayselected <= 5){
-			obj.className = "selected";
-			awayselected += 1;
-		}
-	}
-	else {
-		if (team == "away"){
-			awayselected -= 1;
-		}
-		else {
-			homeselected -= 1;
-		}
-		obj.className = "unselected";
-	}
-}
-
-function getForwards() {
-  $.getJSON("/teams/foo/get-forwards", function(data) {
-    $.each(data.data, function(key, val) {
-console.log(key);
-      $("#home"+(key+1)).attr("value", val);
-    });
-  });
-}
-
-$(getForwards);
+//Test JS code here because I am lazy.
 </script>
 <h1>Hockey Tracker</h1>
 </head>
 <body>
+<div id="blanket" style="display:none;"></div>
+<div id="popUpDiv" style="display:none;">
+	<h3> Enter the player's number and press the appropriate shot button. </h3>
+	<div id="popUp">
+		<input type="button" value="Home" onclick="HomeShot('popUpDiv', 'logShot');">
+		<input id="logShot" type="text" value="" maxlength="2">
+		<input type="button" value="Away" onclick="AwayShot('popUpDiv', 'logShot');">
+	</div>
+</div>	
 <div id="content">
 	<div id="mainContent">
         <div id="timer">
-        <input id="time" type="text" value="20:00" maxlength="5"/>
-        <input type="button" name="" value="Start" onmouseup="StartTime('time',true);" />
-        <input type="button" name="" value="Stop" onmouseup="StartTime('time',false);" />
-		<input type="button" name="" value="Reset" onmouseup="ResetTime('time');" />
-        
+	<input type="button" value="Shot" onclick="shot('popUpDiv');">
+        <input id="time" type="text" value="20:00" maxlength="5">
+        <input type="button" value="Start" onclick="StartTime('time',true);">
+        <input type="button" value="Stop" onclick="StartTime('time',false);">
+	<input type="button" value="Reset" onclick="ResetTime('time');">        
         </div>
     </div>
 </div>
@@ -94,40 +41,40 @@ $(getForwards);
             <form>
                 <table>
                     <tr>
-                        <td><input type="button" value="Forward 1" id="home1" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 2" id="home2" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 3" id="home3" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 1" id="home1" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 2" id="home2" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 3" id="home3" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Forward 4" id="home4" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 5" id="home5" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 6" id="home6" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 4" id="home4" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 5" id="home5" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 6" id="home6" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Forward 7" id="home7" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 8" id="home8" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 9" id="home9" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 7" id="home7" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 8" id="home8" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 9" id="home9" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Forward 10" id="home10" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 11" id="home11" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 12" id="home12" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 10" id="home10" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 11" id="home11" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Forward 12" id="home12" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Defense 1" id="home13" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Defense 2" id="home14" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Defense 1" id="home13" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Defense 2" id="home14" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Defense 3" id="home15" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Defense 4" id="home16" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Defense 3" id="home15" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Defense 4" id="home16" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Defense 5" id="home17" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Defense 6" id="home18" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Defense 5" id="home17" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Defense 6" id="home18" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Goalie 1" id="home19" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Goalie 2" id="home20" class="unselected" onmouseup="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Goalie 1" id="home19" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
+                        <td><input type="button" value="Goalie 2" id="home20" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
                     </tr>
                 </table>
             </form>
@@ -137,40 +84,40 @@ $(getForwards);
             <form>
                 <table>
                     <tr>
-                        <td><input type="button" value="Forward 1" id="away1" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 2" id="away2" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 3" id="away3" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 1" id="away1" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 2" id="away2" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 3" id="away3" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Forward 4" id="away4" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 5" id="away5" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 6" id="away6" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 4" id="away4" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 5" id="away5" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 6" id="away6" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Forward 7" id="away7" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 8" id="away8" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 9" id="away9" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 7" id="away7" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 8" id="away8" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 9" id="away9" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Forward 10" id="away10" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 11" id="away11" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 12" id="away12" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 10" id="away10" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 11" id="away11" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Forward 12" id="away12" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Defense 1" id="away13" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Defense 2" id="away14" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Defense 1" id="away13" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Defense 2" id="away14" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Defense 3" id="away15" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Defense 4" id="away16" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Defense 3" id="away15" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Defense 4" id="away16" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Defense 5" id="away17" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Defense 6" id="away18" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Defense 5" id="away17" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Defense 6" id="away18" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
                     </tr>
                     <tr>
-                        <td><input type="button" value="Goalie 1" id="away19" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Goalie 2" id="away20" class="unselected" onmouseup="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Goalie 1" id="away19" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
+                        <td><input type="button" value="Goalie 2" id="away20" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
                     </tr>
                 </table>
             </form>
@@ -181,3 +128,4 @@ $(getForwards);
 </body>
 
 </html>
+

@@ -41,7 +41,54 @@ p {
 	padding-bottom: 22px;
 }
 
+/*------------------------------
+=POPUPDIV
+------------------------------*/
 
+#blanket {
+   background-color:#111;
+   opacity: 0.65;
+   position:absolute;
+   z-index: 9001;
+   top:0px;
+   left:0px;
+   width:100%;
+}
+#popUpDiv {
+	position:absolute;
+	background-color:#eeeeee;
+	width:300px;
+	height:300px;
+	z-index: 9002;
+}
+
+	#popUpDiv button {
+			width: 35px;
+	}
+	
+		#popUpDiv input[type=text] {
+		width: 70px;
+		vertical-align:bottom;
+		height: 35px;
+		font-size:25px
+	}
+
+		#popUpDiv input[type=button] {
+			width:5em;
+			height:3em;
+			background-color: #A9A9A9;
+		}
+			#popUpDiv input[type=button].selected {
+				width:5em;
+				height:3em;
+				background-color: #FFFFFF;
+			}
+
+#popUp {
+	position:left;
+	padding-left: 40px;
+}			
+	
 
 
 /*------------------------------
@@ -114,7 +161,8 @@ nav {
 ------------------------------*/
 
 #timer {
-	float: right;
+	float: left;
+	padding-left: 70px;
 }
 	#timer input[type=text] {
 		width: 70px;
