@@ -506,12 +506,6 @@
 (def pastGameTable "Past_Game_Table")
 (def liveGameTable "Live_Game_Table")
 
-(defn get-players-attribute
-  [players attribute]
-  (for
-    [p players]
-    (val (find p attribute))))
-
 (defn get-forwards
   [team]
   (with-client client
@@ -534,19 +528,19 @@
 
 (defn get-forwards-names
     [team]
-    (get-players-attribute (get-forwards team) :player_name))
+    (map :player_name (get-forwards team)))
 
 (defn get-defenders-names
-    [team ]
-    (get-players-attribute (get-defenders team) :player_name))
+    [team]
+    (map :player_name (get-defenders team)))
 
 (defn get-goalies-names
-    [team ]
-    (get-players-attribute (get-goalies team) :player_name))
+    [team] 
+    (map :player_name (get-goalies team)))
 
 (defn get-roster-names
-    [team ]
-    (get-players-attribute (get-roster team) :player_name))
+    [team] 
+    (map :player_name (get-roster team)))
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
@@ -554,8 +548,8 @@
        awayTeam \@ homeTeam))
 
 (defn live-game-exists?
-   [gameId]
-   (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
+  [gameId]
+  (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
 
 (defn game-running?
    [gameId]
