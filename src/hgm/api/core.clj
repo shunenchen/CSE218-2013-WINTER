@@ -19,25 +19,25 @@
           (catch java.lang.Throwable t# {:status 500 :body (.getMessage t#)}))))
 
 
-(defapi get-forwards
+(defapi get-forwards-names
   "Get a list of all forwards in `team'."
   [team]
-  (db/get-forwards team))
+  (db/get-forwards-names team))
 
-(defapi get-defense
+(defapi get-defenders-names
   "Get a list of all defense in `team'."
   [team]
-  (db/get-defense team))
+  (db/get-defenders-names team))
 
-(defapi get-goalies
+(defapi get-goalies-names
   "Get a list of all goalies in `team'."
   [team]
-  (db/get-goalies team))
+  (db/get-goalies-names team))
 
-(defapi get-roster
+(defapi get-roster-names
   "Get the roster of `team'."
   [team]
-  (db/get-roster team))
+  (db/get-roster-names team))
 
 (defapi get-users
   "Get a list of all users in the system."
@@ -52,24 +52,27 @@
 ;;; the add-X-event functions are stubs and do not reflect an actual api...
 (defapi add-start-game-event
   "Start a game."
-  [home away]
-  (if-let [game (db/query home away)]
-    {:gameId (:uuid game)}
-    (let [gameId (db/create-game home away)]
-      (db/add-gameEvents gameId 0 "on-ice")
-      {:gameId gameId})))
+  [gameId startTime homePlayers awayPlayers]
+  (if (or (not (db/live-game-exists? gameId)) (db/game-running? gameId))
+    (throw (Exception. "GAME ALREADY STARTED / NON-EXISTANT"))
+    (do (db/add-gameEvent gameId 0 {:type :start :time startTime})
+    	(doseq [p (concat homePlayers awayPlayers)]
+          (db/add-gameEvent gameId 0 {:type :on-ice :player p})))))
 
 (defapi add-swap-players-event
   "Swap two players during a game."
   [gameId time outPlayer inPlayer]
-  (db/add-gameEvents gameId time "swap" outPlayer inPlayer))
+  (db/add-gameEvent gameId time
+                    {:type :off-ice :player outPlayer})
+  (db/add-gameEvent gameId time
+                    {:type :in-ice :player inPlayer}))
 
 (defapi add-end-game-event
   "End a game."
   [gameId time]
-  (db/add-gameEvents gameId time "end"))
+  (db/add-gameEvent gameId time {:type :end}))
 
 (defapi add-shot-event
   "Add a shot event."
   [gameId time player]
-  (db/add-gameEvents gameId time "shot taken" player))
+  (db/add-gameEvent gameId time {:type :shot :player player}))

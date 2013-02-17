@@ -24,10 +24,10 @@
                           "resources/hockey.html"
                           "resources/login.html")))
 
-  (GET  "/teams/:team/get-forwards" [team] (api/get-forwards team))
-  (GET  "/teams/:team/get-defense"  [team] (api/get-defense  team))
-  (GET  "/teams/:team/get-goalies"  [team] (api/get-goalies  team))
-  (GET  "/teams/:team/get-roster"   [team] (api/get-roster   team))
+  (GET  "/teams/:team/get-forwards" [team] (api/get-forwards-names team))
+  (GET  "/teams/:team/get-defense"  [team] (api/get-defenders-names  team))
+  (GET  "/teams/:team/get-goalies"  [team] (api/get-goalies-names  team))
+  (GET  "/teams/:team/get-roster"   [team] (api/get-roster-names   team))
 
   ;; FIXME: /users should be admin-only, but we'll wait until we have a proper db
   (GET  "/users"                    []     (api/get-users))
