@@ -544,7 +544,7 @@
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
-  (str year \_ (format "%02d" month) \_ (format "%02d" day) \_ startTime \_
+  (str year \- (format "%02d" month) \- (format "%02d" day) \- startTime \-
        awayTeam \@ homeTeam))
 
 (defn live-game-exists?
@@ -565,7 +565,7 @@
   (with-client client
       (put-item liveGameTable 
 	{ :game_ID gameId
-	  :game_clock_uuid (str (convert-gameClock gameClock) \_ (uuid)) 
+	  :game_clock_uuid (str (convert-gameClock gameClock) \- (uuid)) 
           :event (str gameEvent)})))
 
 ;(defn test-gameEvents
