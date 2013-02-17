@@ -44,6 +44,19 @@
   []
   (db/get-users))
 
+(defapi get-events
+  "Get a list of all game events for a particular game"
+  [gameId]
+  (db/get-game-events gameId))
+
+(defapi get-player-stats
+  "Get a list of all stats for this player
+  stats currently supported
+    * plus-minus"
+  [player]
+  (db/get-player-events player))
+
+
 (defapi update-user
   "Update a user with some attributes."
   [user roles]
@@ -76,3 +89,14 @@
   "Add a shot event."
   [gameId time player]
   (db/add-gameEvent gameId time {:type :shot :player player}))
+
+(defapi add-goal-event
+  "Add a goal event. Assist is a list of up to 2 playerIds who assisted"
+  [gameId time player assists]
+  (db/add-gameEvent gameId time {:type :goal :player player :assists assists}))
+
+(defapi add-penalty-event
+  "add a penalty for a particular player
+  different penalty types will have different additional data"
+  [gameId time player penalty]
+  (db/add-gameEvent gameId time {:type :goal :player player :penalty penalty}))

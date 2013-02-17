@@ -575,10 +575,12 @@
 (def users (atom {}))
 
 (defn get-users
+  "return all users"
   []
   (vec (vals @users)))
 
 (defn get-user
+  "id is google identity, return that user"
   [id]
   (@users id))
 
@@ -599,4 +601,14 @@
   [year month day startTime awayTeam homeTeam]
   ;TODO do stuff here to setup game as necessary
   (game-id year month day startTime awayTeam homeTeam))
+
+(defn get-player-events
+  "FIXME: get all events for the given player"
+  [player]
+  {})
+
+(defn get-game-events
+  "FIXME: get all events for game gameId"
+  [gameId]
+  {})
 
