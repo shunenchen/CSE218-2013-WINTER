@@ -553,11 +553,20 @@
   (str year \_ (format "%02d" month) \_ (format "%02d" day) \_ startTime \_
        awayTeam \@ homeTeam))
 
+(defn live-game-exists?
+   [gameId]
+   (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
+
+(defn game-running?
+   [gameId]
+   ;is there a start game event for this gameId already? - dynamo scan
+   false)
+
 (defn add-gameEvent
-  [gameID gameClock gameEvent]
+  [gameId gameClock gameEvent]
   (with-client client
       (put-item liveGameTable 
-	{ :game_ID gameID
+	{ :game_id gameId
 	  :game_clock_uuid (str gameClock \_ (uuid)) 
           :event (str gameEvent)})))
 
