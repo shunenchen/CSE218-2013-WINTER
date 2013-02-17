@@ -548,26 +548,20 @@
     [team ]
     (get-players-attribute (get-roster team) :player_name))
 
-(defn add-gameEvents
-  [gameID gameClock gameEvent teamInovled]
+(defn game-id
+  [year month day startTime awayTeam homeTeam]
+  (str year \_ (format "%02d" month) \_ (format "%02d" day) \_ startTime \_
+       awayTeam \@ homeTeam))
+
+(defn add-gameEvent
+  [gameID gameClock gameEvent]
   (with-client client
       (put-item liveGameTable 
-	  {:game_ID gameID :game_clock_game_event_ID (str gameClock (uuid)) 
-		:event gameEvent  :team teamInovled }
-		)
-	)
-)
-;;Example
-;;(add-gameEvents "2012-02-07-07:30PM-LA-SD" "62:00_" "A Lineup Change to : SD_F00, SD_F01, ;SD_F02 , SD_F03 , SD_G00" "San Diego")
-;(defn add-gameEvents
-;  [gameID gameClock gameEvent teamInovled]
-;  (with-client client
-;      (put-item liveGameTable 
-;	  {:game_ID gameID :game_clock_game_event_ID (str gameClock (uuid)) 
-;		:event gameEvent  :team teamInovled }
-;		)
-;	)
-;)
+	{ :game_ID gameID
+	  :game_clock_uuid (str gameClock \_ (uuid)) 
+          :event (str gameEvent)})))
+
+;(add-gameEvent (game-id 2012 2 7 19:30 "SD" "LD") "0:12:34.5678" {:type "Penalty" :name "John Mangan"})
 
 (def users (atom {}))
 
@@ -591,16 +585,9 @@
   ((swap! users update-in [user] assoc :roles roles)
    user))
 
-(defn add-gameEvent
-  "FIXME: do something useful"
-  [gameId time eventType & details]
-  {:gameId gameId
-   :time time
-   :eventType eventType
-   :details details})
-
 (defn create-game
   "FIXME: do something useful"
-  [home away]
-  "XXXX-XXXX-XXXX-XXXX")
+  [year month day startTime awayTeam homeTeam]
+  ;TODO do stuff here to setup game as necessary
+  (game-id year month day startTime awayTeam homeTeam))
 

@@ -12,11 +12,5 @@
             ])
 )
 
-;Example
-;(add-gameEvents "2012-02-07-07:30PM-LA-SD" "62:00_" "A Lineup Change to : SD_F00, SD_F01, ;SD_F02 , SD_F03 , SD_G00" "San Diego")
-;
-
-;Example
-;(add-gameEvents "2012-02-07-07:30PM-LA-SD" "62:00_" "A Lineup Change to : SD_F00, SD_F01, ;SD_F02 , SD_F03 , SD_G00" "San Diego")
 ;heroku config:add --app hockey-game-manager DYNAMODB_ACCESS_KEY=Key
 ;heroku config:add --app hockey-game-manager DYNAMODB_SECRET_KEY=Key

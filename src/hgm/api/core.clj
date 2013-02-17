@@ -52,24 +52,27 @@
 ;;; the add-X-event functions are stubs and do not reflect an actual api...
 (defapi add-start-game-event
   "Start a game."
-  [home away]
-  (if-let [game (db/query home away)]
-    {:gameId (:uuid game)}
-    (let [gameId (db/create-game home away)]
-      (db/add-gameEvents gameId 0 "on-ice")
-      {:gameId gameId})))
+  [gameId startTime homePlayers awayPlayers]
+  (if (or (game-running? gameId) (not (query gameId)))
+    (throw (Exception. "GAME ALREADY STARTED / NON-EXISTANT"))
+    (do (db/add-gameEvent gameId 0 {:type :start :time startTime})
+    	(doseq [p (concat homePlayers awayPlayers)]
+          (db/add-gameEvent gameId 0 {:type :on-ice :player p})))))
 
 (defapi add-swap-players-event
   "Swap two players during a game."
   [gameId time outPlayer inPlayer]
-  (db/add-gameEvents gameId time "swap" outPlayer inPlayer))
+  (db/add-gameEvent gameId time
+                    {:type :off-ice :player outPlayer})
+  (db/add-gameEvent gameId time
+                    {:type :in-ice :player inPlayer}))
 
 (defapi add-end-game-event
   "End a game."
   [gameId time]
-  (db/add-gameEvents gameId time "end"))
+  (db/add-gameEvent gameId time {:type :end}))
 
 (defapi add-shot-event
   "Add a shot event."
   [gameId time player]
-  (db/add-gameEvents gameId time "shot taken" player))
+  (db/add-gameEvent gameId time {:type :shot :player player}))
