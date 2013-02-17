@@ -552,19 +552,44 @@
   (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
 
 (defn game-running?
-   [gameId]
-   ;is there a start game event for this gameId already? - dynamo scan
-   false)
+  [gameId]
+  ;is there a start game event for this gameId already? - dynamo scan
+  false)
+
+(defn convert-gameClock
+  [gameClock]
+  (format "%07d" gameClock))
 
 (defn add-gameEvent
   [gameId gameClock gameEvent]
   (with-client client
       (put-item liveGameTable 
-	{ :game_id gameId
-	  :game_clock_uuid (str gameClock \_ (uuid)) 
+	{ :game_ID gameId
+	  :game_clock_uuid (str (convert-gameClock gameClock) \_ (uuid)) 
           :event (str gameEvent)})))
 
-;(add-gameEvent (game-id 2012 2 7 19:30 "SD" "LD") "0:12:34.5678" {:type "Penalty" :name "John Mangan"})
+;(defn test-gameEvents
+;  []
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 0 {:type :start})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 60000 {:type :shot :player "John Mangan"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 75000 {:type :penalty :player "David Srour"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 200000 {:type :shot :player "Samuel Chen"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 220000 {:type :shot :player "John Mangan"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 260000 {:type :penalty :player "Ben Ellis"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 3600000 {:type :end}))
+
+(defn get-gameEvents
+  ([gameId]
+    (with-client client (query liveGameTable gameId {})))
+  ([gameId gameClock]
+    ; Will return inclusive such as a >= due to UUIDs
+    (with-client client (query liveGameTable gameId
+      {:range_condition [:GT (convert-gameClock gameClock)]})))
+  ([gameId gameClockStart gameClockEnd]
+    ; Will return inclusive of the start, exclusive of the end time
+    (with-client client (query liveGameTable gameId {:range_condition
+      [:BETWEEN (convert-gameClock gameClockStart)
+        (convert-gameClock gameClockEnd)]}))))
 
 (def users (atom {}))
 
