@@ -18,11 +18,13 @@
 
 
 (defroutes hgm-routes
-  (GET  "/" request (io/file (if (friend/authorized?
-                                  #{:official}
-                                  friend/*identity*)
-                          "resources/hockey.html"
-                          "resources/login.html")))
+  (GET  "/" request
+        (io/file
+         (if (friend/authorized? #{:admin} friend/*identity*)
+           "resources/controlPanel.html"
+           (if (friend/authorized? #{:official} friend/*identity*)
+             "resources/hockey.html"
+             "resources/login.html"))))
 
   (GET  "/teams/:team/get-forwards" [team] (api/get-forwards-names team))
   (GET  "/teams/:team/get-defense"  [team] (api/get-defenders-names  team))
