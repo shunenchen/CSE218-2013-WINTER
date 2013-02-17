@@ -1,10 +1,22 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+<script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
 <title>Hockey Game Manager</title>
 <meta charset="UTF-8" />
 <link rel="stylesheet" type="text/css" href="public/reset.css">
 <link rel="stylesheet" type="text/css" href="public/cp_structure.css">
+
+<script>
+$(document).ready(function() {
+  $("#promote-button").click(function() {
+    $.getJSON("http://ip.jsontest.com/", function(data,status) {
+      alert("Data = " + data["ip"] + "\nStatus = " + status);
+    });
+  });
+});
+</script>
+
 </head>
 
 <body>
@@ -45,7 +57,7 @@
   Hockey Game Manager | CSE 218
 </footer>
 
-    
     <div id="content"></div>
+
 </body>
 </html>

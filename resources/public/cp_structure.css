@@ -184,5 +184,5 @@ footer#main{
 	width:100%;
 }
 
-#leftcolumn { width: 425px; border: 1px solid black; float: left}
-#rightcolumn { width: 425px; border: 1px solid black; float: right}
+#leftcolumn { width: 425px; border: 1px solid black; float: left; margin-top: 100px;}
+#rightcolumn { width: 425px; border: 1px solid black; float: right; margin-top: 100px;}
