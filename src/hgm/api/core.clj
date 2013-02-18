@@ -1,4 +1,5 @@
 (ns hgm.api.core
+  (:use hgm.api.internal)
   (:require [hgm.db.core :as db]))
 
 
@@ -19,29 +20,29 @@
           (catch java.lang.Throwable t# {:status 500 :body (.getMessage t#)}))))
 
 
-(defapi get-forwards-names
+(defapi get-forwards
   "Get a list of all forwards in `team'."
   [team]
-  (db/get-forwards-names team))
+  (db/get-forwards team))
 
-(defapi get-defenders-names
+(defapi get-defenders
   "Get a list of all defense in `team'."
   [team]
-  (db/get-defenders-names team))
+  (db/get-defenders team))
 
-(defapi get-goalies-names
+(defapi get-goalies
   "Get a list of all goalies in `team'."
   [team]
-  (db/get-goalies-names team))
+  (db/get-goalies team))
 
-(defapi get-roster-names
+(defapi get-roster
   "Get the roster of `team'."
   [team]
-  (db/get-roster-names team))
+  (db/get-roster team))
 
 (defapi get-users
   "Get a list of all users in the system."
-  []
+   []
   (db/get-users))
 
 (defapi get-events
@@ -69,7 +70,7 @@
   (if (or (not (db/live-game-exists? gameId)) (db/game-running? gameId))
     (throw (Exception. "GAME ALREADY STARTED / NON-EXISTANT"))
     (do (db/add-gameEvent gameId 0 {:type :start :time startTime})
-    	(doseq [p (concat homePlayers awayPlayers)]
+        (doseq [p (concat homePlayers awayPlayers)]
           (db/add-gameEvent gameId 0 {:type :on-ice :player p})))))
 
 (defapi add-swap-players-event

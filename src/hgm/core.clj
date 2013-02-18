@@ -25,8 +25,8 @@
            (if (friend/authorized? #{:official} friend/*identity*)
              "resources/hockey.html"
              "resources/login.html"))))
-  
-  ; roster 
+
+  ; roster
   (GET  "/teams/:team/get-forwards" [team] (api/get-forwards-names team))
   (GET  "/teams/:team/get-defense"  [team] (api/get-defenders-names  team))
   (GET  "/teams/:team/get-goalies"  [team] (api/get-goalies-names  team))
@@ -60,13 +60,13 @@
         (friend/authorize #{:official}
            (api/add-shot-event gameId time player)))
 
-  ; assists is a list of up to two player ids         
+  ; assists is a list of up to two player ids
   (POST "/events/goal"              [gameId time player assists]
         (friend/authorize #{:official}
            (api/add-goal-event gameId time player assists)))
 
   ; penalty is a map that includes penalty type, and all other relevant
-  ; information for the penalty 
+  ; information for the penalty
   ; FIXME : hash out with Cam
   (POST "/events/penalty"              [gameId time player penalty]
         (friend/authorize #{:official}

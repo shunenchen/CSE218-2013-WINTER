@@ -31,7 +31,7 @@
 
 (defn uuidInt []
   "Take UUID and make it a number"
- (read-string 
+ (read-string
   (str "0x" (apply str (filter #(#{\a,\b,\c,\d,\e,\f,\1,\2,\3,\4,\5,\6,\7,\8,\9} %) (uuid))))))
 
 (def ^{:dynamic true} *ddb_client*)
@@ -494,7 +494,7 @@
                 (assoc options :exclusive_start_key (KeyObject->key (.getLastEvaluatedKey result))))
           )
         )))
-		
+
 ;;; DB CODE GOES HERE
 
 (def properties {:access_key (System/getenv "DYNAMODB_ACCESS_KEY") :secret_key (System/getenv "DYNAMODB_SECRET_KEY")})
@@ -509,17 +509,17 @@
 (defn get-forwards
   [team]
   (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "F_"]})))
+        (query playerTable team {:range_condition [:BEGINS_WITH "F_"]})))
 
 (defn get-defenders
   [team]
   (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "D_"]})))
+        (query playerTable team {:range_condition [:BEGINS_WITH "D_"]})))
 
 (defn get-goalies
   [team]
   (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "G_"]})))
+        (query playerTable team {:range_condition [:BEGINS_WITH "G_"]})))
 
 (defn get-roster
  [team]
@@ -535,12 +535,25 @@
     (map :player_name (get-defenders team)))
 
 (defn get-goalies-names
-    [team] 
+    [team]
     (map :player_name (get-goalies team)))
 
 (defn get-roster-names
-    [team] 
+    [team]
     (map :player_name (get-roster team)))
+
+;; FIXME: ignore the implementation of the next two functions, but we need "real" versions of them
+(defn get-player-career-stats
+  [player]
+  [{:type :goal :player player :game-id "blah" :team "Los Angeles" :time 50}
+   {:type :goal :player player :game-id "blah2" :team "Los Angeles" :time 60}
+   {:type :on-ice :player player :game-id "blah" :time 100}])
+
+(defn get-player-game-stats
+  [player game]
+  [{:type :goal :player player :game-id game :team "Los Angeles" :time 50}
+   {:type :goal :player player :game-id game :team "Los Angeles" :time 60}
+   {:type :on-ice :player player :game-id game :time 100}])
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
@@ -563,9 +576,9 @@
 (defn add-gameEvent
   [gameId gameClock gameEvent]
   (with-client client
-      (put-item liveGameTable 
-	{ :game_ID gameId
-	  :game_clock_uuid (str (convert-gameClock gameClock) \_ (uuid)) 
+      (put-item liveGameTable
+        { :game_ID gameId
+          :game_clock_uuid (str (convert-gameClock gameClock) \_ (uuid))
           :event (str gameEvent)})))
 
 ;(defn test-gameEvents
