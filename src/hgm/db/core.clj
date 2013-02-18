@@ -523,24 +523,24 @@
 
 (defn get-roster
  [team]
-  (with-client client
-         (query playerTable team {})))
+   (let [players (with-client client (scan playerTable {}))]
+     (filter #(= team (:team %)) (filter #(= ":team" (:type %)) players))))
 
 (defn get-forwards-names
     [team]
-    (map :player_name (get-forwards team)))
+    (map :name (get-forwards team)))
 
 (defn get-defenders-names
     [team]
-    (map :player_name (get-defenders team)))
+    (map :name (get-defenders team)))
 
 (defn get-goalies-names
     [team] 
-    (map :player_name (get-goalies team)))
+    (map :name (get-goalies team)))
 
 (defn get-roster-names
     [team] 
-    (map :player_name (get-roster team)))
+    (map :name (get-roster team)))
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
@@ -555,6 +555,10 @@
   [gameId]
   ;is there a start game event for this gameId already? - dynamo scan
   false)
+
+(defn convert-realTime
+  [dateTime]
+  (format "%013d" dateTime))
 
 (defn convert-gameClock
   [gameClock]
