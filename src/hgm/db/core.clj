@@ -31,7 +31,7 @@
 
 (defn uuidInt []
   "Take UUID and make it a number"
- (read-string 
+ (read-string
   (str "0x" (apply str (filter #(#{\a,\b,\c,\d,\e,\f,\1,\2,\3,\4,\5,\6,\7,\8,\9} %) (uuid))))))
 
 (def ^{:dynamic true} *ddb_client*)
@@ -494,7 +494,7 @@
                 (assoc options :exclusive_start_key (KeyObject->key (.getLastEvaluatedKey result))))
           )
         )))
-		
+
 ;;; DB CODE GOES HERE
 
 (def properties {:access_key (System/getenv "DYNAMODB_ACCESS_KEY") :secret_key (System/getenv "DYNAMODB_SECRET_KEY")})
@@ -506,26 +506,20 @@
 (def pastGameTable "Past_Game_Table")
 (def liveGameTable "Live_Game_Table")
 
-(defn get-players-attribute
-  [players attribute]
-  (for
-    [p players]
-    (val (find p attribute))))
-
 (defn get-forwards
   [team]
   (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "F_"]})))
+        (query playerTable team {:range_condition [:BEGINS_WITH "F_"]})))
 
 (defn get-defenders
   [team]
   (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "D_"]})))
+        (query playerTable team {:range_condition [:BEGINS_WITH "D_"]})))
 
 (defn get-goalies
   [team]
   (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "G_"]})))
+        (query playerTable team {:range_condition [:BEGINS_WITH "G_"]})))
 
 (defn get-roster
  [team]
@@ -534,19 +528,32 @@
 
 (defn get-forwards-names
     [team]
-    (get-players-attribute (get-forwards team) :player_name))
+    (map :player_name (get-forwards team)))
 
 (defn get-defenders-names
-    [team ]
-    (get-players-attribute (get-defenders team) :player_name))
+    [team]
+    (map :player_name (get-defenders team)))
 
 (defn get-goalies-names
-    [team ]
-    (get-players-attribute (get-goalies team) :player_name))
+    [team]
+    (map :player_name (get-goalies team)))
 
 (defn get-roster-names
-    [team ]
-    (get-players-attribute (get-roster team) :player_name))
+    [team]
+    (map :player_name (get-roster team)))
+
+;; FIXME: ignore the implementation of the next two functions, but we need "real" versions of them
+(defn get-player-career-stats
+  [player]
+  [{:type :goal :player player :game-id "blah" :team "Los Angeles" :time 50}
+   {:type :goal :player player :game-id "blah2" :team "Los Angeles" :time 60}
+   {:type :on-ice :player player :game-id "blah" :time 100}])
+
+(defn get-player-game-stats
+  [player game]
+  [{:type :goal :player player :game-id game :team "Los Angeles" :time 50}
+   {:type :goal :player player :game-id game :team "Los Angeles" :time 60}
+   {:type :on-ice :player player :game-id game :time 100}])
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
@@ -554,23 +561,48 @@
        awayTeam \@ homeTeam))
 
 (defn live-game-exists?
-   [gameId]
-   (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
+  [gameId]
+  (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
 
 (defn game-running?
-   [gameId]
-   ;is there a start game event for this gameId already? - dynamo scan
-   false)
+  [gameId]
+  ;is there a start game event for this gameId already? - dynamo scan
+  false)
+
+(defn convert-gameClock
+  [gameClock]
+  (format "%07d" gameClock))
 
 (defn add-gameEvent
   [gameId gameClock gameEvent]
   (with-client client
-      (put-item liveGameTable 
-	{ :game_id gameId
-	  :game_clock_uuid (str gameClock \_ (uuid)) 
+      (put-item liveGameTable
+        { :game_ID gameId
+          :game_clock_uuid (str (convert-gameClock gameClock) \_ (uuid))
           :event (str gameEvent)})))
 
-;(add-gameEvent (game-id 2012 2 7 19:30 "SD" "LD") "0:12:34.5678" {:type "Penalty" :name "John Mangan"})
+;(defn test-gameEvents
+;  []
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 0 {:type :start})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 60000 {:type :shot :player "John Mangan"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 75000 {:type :penalty :player "David Srour"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 200000 {:type :shot :player "Samuel Chen"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 220000 {:type :shot :player "John Mangan"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 260000 {:type :penalty :player "Ben Ellis"})
+;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 3600000 {:type :end}))
+
+(defn get-gameEvents
+  ([gameId]
+    (with-client client (query liveGameTable gameId {})))
+  ([gameId gameClock]
+    ; Will return inclusive such as a >= due to UUIDs
+    (with-client client (query liveGameTable gameId
+      {:range_condition [:GT (convert-gameClock gameClock)]})))
+  ([gameId gameClockStart gameClockEnd]
+    ; Will return inclusive of the start, exclusive of the end time
+    (with-client client (query liveGameTable gameId {:range_condition
+      [:BETWEEN (convert-gameClock gameClockStart)
+        (convert-gameClock gameClockEnd)]}))))
 
 (def users (atom {}))
 
