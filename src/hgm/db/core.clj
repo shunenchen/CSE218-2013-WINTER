@@ -587,7 +587,7 @@
 (defn create-user
   [m]
   ((swap! users assoc (:identity m)
-          (assoc m :roles #{:official}))
+          (assoc m :roles #{:admin}))
    (:identity m)))
 
 (defn update-user

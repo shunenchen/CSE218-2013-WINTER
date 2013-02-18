@@ -8,13 +8,71 @@
 <link rel="stylesheet" type="text/css" href="cp_structure.css">
 
 <script>
+var user_ids = {};
+
 $(document).ready(function() {
-  $("#promote-button").click(function() {
-    $.getJSON("http://ip.jsontest.com/", function(data,status) {
-      alert("Data = " + data["ip"] + "\nStatus = " + status);
-    });
-  });
+  	$("#demote-button").click(function() {
+		source = document.getElementById('selectOfficials');
+		target = document.getElementById('selectFans');
+		
+		for(var i=(source.options.length-1); i>=0; i--){
+			if(source.options[i].selected){			  	
+			
+				$.ajax({
+					url: '/users:' + encodeURIComponent(user_ids[source.options[i].text]),
+					type: 'PUT',
+					contentType: 'application/json',
+					data: { roles: ['fan']},
+				});
+			
+
+				target.options[target.options.length]=new Option(source.options[i].text);
+				source.options[i] = null;
+			}	
+		}
+  	});
 });
+
+$(document).ready(function() {
+  	$("#promote-button").click(function() {
+		source = document.getElementById('selectFans');
+		target = document.getElementById('selectOfficials');
+		
+		for(var i=(source.options.length-1); i>=0; i--){
+			if(source.options[i].selected){			  
+							
+				$.ajax({
+					url: '/users:' + encodeURIComponent(user_ids[source.options[i].text]),
+					type: 'PUT',
+					contentType: 'application/json',
+					data: { roles: ['official']},
+				});
+			
+	
+				target.options[target.options.length]=new Option(source.options[i].text);
+				source.options[i] = null;
+			}
+		}
+  	});
+});
+
+window.onload=function() {
+	// Populate DOMs
+	$.getJSON("/users", function(data,status) 
+	{		
+		for (var i = 0; i < data["data"].length; i++) { 
+			if ("admin" == data["data"][i]["roles"] || "officials" == data["data"][i]["roles"]) {
+				target = document.getElementById('selectOfficials');
+   				target.options[target.options.length]=new Option(data["data"][i]["email"]);
+			}
+			else if ("fan" == data["data"][i]["roles"] || "fan" == data["data"][i]["roles"]) {
+				target = document.getElementById('selectFans');
+   				target.options[target.options.length]=new Option(data["data"][i]["email"]);
+			}
+			user_ids[data["data"][i]["email"]] = data["data"][i]["identity"];
+		}      
+    });	
+};
 </script>
 
 </head>
@@ -28,24 +86,14 @@ $(document).ready(function() {
 	<content>	  
         <div id="leftcolumn" align="left"> 
             <td align="left">Fans:</td> </br>
-            <td align="left"><select name="selectFan" id="selectFan" size="15" multiple="multiple" style="width: 425px;">
-            <option value="user1">Fan Name 1</option>
-            <option value="user2">Fan Name 2</option>
-            <option value="user3">Fan Name 3</option>
-            <option value="user4">Fan Name 4</option>
-            <option value="user5">Fan Name 5</option>
+            <td align="left"><select name="selectFans" id="selectFans" size="15" multiple="multiple" style="width: 425px; min-height: 300px; max_size: 300px;">
             </select></td>
             <button type="submit" id="promote-button" class="btn" style="visibility: visible">Promote To Official</button>
         </div>
         
        <div id="rightcolumn" align="left"> 
             <td align="left">Officials:</td> </br>
-            <td align="left"><select name="selectOfficial" id="selectOfficial" size="15" multiple="multiple" style="width: 425px;">
-            <option value="user6">Official Name 6</option>
-            <option value="user7">Official Name 7</option>
-            <option value="user8">Official Name 8</option>
-            <option value="user9">Official Name 9</option>
-            <option value="user10">Official Name 10</option>
+            <td align="left"><select name="selectOfficials" id="selectOfficials" multiple="multiple" style="width: 425px; min-height: 300px; max_size: 300px;">
             </select></td>
             <button type="submit" id="demote-button" class="btn" style="visibility: visible">Demote To Fan</button>
         </div>
