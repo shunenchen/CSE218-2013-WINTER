@@ -27,10 +27,10 @@
              "resources/login.html"))))
 
   ; roster
-  (GET  "/teams/:team/get-forwards" [team] (api/get-forwards-names team))
-  (GET  "/teams/:team/get-defense"  [team] (api/get-defenders-names  team))
-  (GET  "/teams/:team/get-goalies"  [team] (api/get-goalies-names  team))
-  (GET  "/teams/:team/get-roster"   [team] (api/get-roster-names   team))
+  (GET  "/teams/:team/get-forwards" [team] (api/get-forwards team))
+  (GET  "/teams/:team/get-defense"  [team] (api/get-defenders  team))
+  (GET  "/teams/:team/get-goalies"  [team] (api/get-goalies  team))
+  (GET  "/teams/:team/get-roster"   [team] (api/get-roster   team))
 
   ; stats
   (GET  "/stats/players/:player"    [player] (api/get-player-stats player))
