@@ -604,7 +604,7 @@
 (defn get-users
   "Returns a lazy sequence of users."
   []
-    (map read-string (map :cmap (with-client client (scan userTable {}))))
+    (map read-string (map :cmap (with-client client (scan userTable {})))))
 
 (defn get-user
   "Returns the first user with the given google id, or nil if one doesn't exist."

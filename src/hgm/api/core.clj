@@ -48,7 +48,7 @@
 (defapi get-events
   "Get a list of all game events for a particular game"
   [gameId]
-  (db/get-gameEvents gameId))
+  (db/get-game-events gameId))
 
 (defapi get-player-stats
   "Get a list of all stats for this player
@@ -69,35 +69,35 @@
   [gameId startTime homePlayers awayPlayers]
   (if (or (not (db/live-game-exists? gameId)) (db/game-running? gameId))
     (throw (Exception. "GAME ALREADY STARTED / NON-EXISTANT"))
-    (do (db/add-gameEvent gameId 0 {:type :start :time startTime})
+    (do (db/add-game-event gameId 0 {:type :start :time startTime})
         (doseq [p (concat homePlayers awayPlayers)]
-          (db/add-gameEvent gameId 0 {:type :on-ice :player p})))))
+          (db/add-game-event gameId 0 {:type :on-ice :player p})))))
 
 (defapi add-swap-players-event
   "Swap two players during a game."
   [gameId time outPlayer inPlayer]
-  (db/add-gameEvent gameId time
+  (db/add-game-event gameId time
                     {:type :off-ice :player outPlayer})
-  (db/add-gameEvent gameId time
+  (db/add-game-event gameId time
                     {:type :in-ice :player inPlayer}))
 
 (defapi add-end-game-event
   "End a game."
   [gameId time]
-  (db/add-gameEvent gameId time {:type :end}))
+  (db/add-game-event gameId time {:type :end}))
 
 (defapi add-shot-event
   "Add a shot event."
   [gameId time player]
-  (db/add-gameEvent gameId time {:type :shot :player player}))
+  (db/add-game-event gameId time {:type :shot :player player}))
 
 (defapi add-goal-event
   "Add a goal event. Assist is a list of up to 2 playerIds who assisted"
   [gameId time player assists]
-  (db/add-gameEvent gameId time {:type :goal :player player :assists assists}))
+  (db/add-game-event gameId time {:type :goal :player player :assists assists}))
 
 (defapi add-penalty-event
   "add a penalty for a particular player
   different penalty types will have different additional data"
   [gameId time player penalty]
-  (db/add-gameEvent gameId time {:type :goal :player player :penalty penalty}))
+  (db/add-game-event gameId time {:type :goal :player player :penalty penalty}))
