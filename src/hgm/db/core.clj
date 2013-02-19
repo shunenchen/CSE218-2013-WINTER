@@ -505,6 +505,7 @@
 (def teamTable     "Team_Table")
 (def pastGameTable "Past_Game_Table")
 (def liveGameTable "Live_Game_Table")
+(def userTable     "User_Table")
 
 (defn get-all-players
   []
@@ -604,12 +605,12 @@
 (defn get-users
   "return all users"
   []
-  (vec (vals @users)))
+    (with-client client (scan userTable {})))
 
 (defn get-user
   "id is google identity, return that user"
   [id]
-  (@users id))
+    (filter #(= (:googleID %) id) (get-users)))
 
 (defn create-user
   [m]
