@@ -31,7 +31,7 @@
 
 (defn uuidInt []
   "Take UUID and make it a number"
- (read-string 
+ (read-string
   (str "0x" (apply str (filter #(#{\a,\b,\c,\d,\e,\f,\1,\2,\3,\4,\5,\6,\7,\8,\9} %) (uuid))))))
 
 (def ^{:dynamic true} *ddb_client*)
@@ -494,7 +494,7 @@
                 (assoc options :exclusive_start_key (KeyObject->key (.getLastEvaluatedKey result))))
           )
         )))
-		
+
 ;;; DB CODE GOES HERE
 
 (def properties {:access_key (System/getenv "DYNAMODB_ACCESS_KEY") :secret_key (System/getenv "DYNAMODB_SECRET_KEY")})
@@ -534,6 +534,18 @@
   [team]
     (get-roster-by-position team "goalie"))
 
+;; FIXME: ignore the implementation of the next two functions, but we need "real" versions of them
+(defn get-player-career-stats
+  [player]
+  [{:type :goal :player player :game-id "blah" :team "Los Angeles" :time 50}
+   {:type :goal :player player :game-id "blah2" :team "Los Angeles" :time 60}
+   {:type :on-ice :player player :game-id "blah" :time 100}])
+
+(defn get-player-game-stats
+  [player game]
+  [{:type :goal :player player :game-id game :team "Los Angeles" :time 50}
+   {:type :goal :player player :game-id game :team "Los Angeles" :time 60}
+   {:type :on-ice :player player :game-id game :time 100}])
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
@@ -603,7 +615,7 @@
 (defn create-user
   [m]
   ((swap! users assoc (:identity m)
-          (assoc m :roles #{:official}))
+          (assoc m :roles #{:admin}))
    (:identity m)))
 
 (defn update-user
