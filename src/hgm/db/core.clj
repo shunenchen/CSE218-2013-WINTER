@@ -554,12 +554,11 @@
 
 (defn live-game-exists?
   [gameId]
-  (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
+    (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
 
 (defn game-running?
   [gameId]
-  ;is there a start game event for this gameId already? - dynamo scan
-  false)
+    (< 0 (count (filter #(= "{:type :start}" %) (map :event (with-client client (query liveGameTable gameId {})))))))
 
 (defn convert-realTime
   [dateTime]
