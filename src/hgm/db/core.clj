@@ -506,41 +506,34 @@
 (def pastGameTable "Past_Game_Table")
 (def liveGameTable "Live_Game_Table")
 
+(defn get-all-players
+  []
+    (with-client client (scan playerTable {})))
+
+(defn get-active-players
+  []
+    (filter #(= "RECENT" (:date-time-uuid %)) (get-all-players)))
+
+(defn get-roster
+  [team]
+    (filter #(= team (:team %)) (get-active-players)))
+
+(defn get-roster-by-position
+  [team position]
+    (filter #(= position (:position %)) (get-roster team)))
+
 (defn get-forwards
   [team]
-  (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "F_"]})))
+    (get-roster-by-position team "forward"))
 
 (defn get-defenders
   [team]
-  (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "D_"]})))
+    (get-roster-by-position team "defender"))
 
 (defn get-goalies
   [team]
-  (with-client client
-	(query playerTable team {:range_condition [:BEGINS_WITH "G_"]})))
+    (get-roster-by-position team "goalie"))
 
-(defn get-roster
- [team]
-   (let [players (with-client client (scan playerTable {}))]
-     (filter #(= team (:team %)) (filter #(= ":team" (:type %)) players))))
-
-(defn get-forwards-names
-    [team]
-    (map :name (get-forwards team)))
-
-(defn get-defenders-names
-    [team]
-    (map :name (get-defenders team)))
-
-(defn get-goalies-names
-    [team] 
-    (map :name (get-goalies team)))
-
-(defn get-roster-names
-    [team] 
-    (map :name (get-roster team)))
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
