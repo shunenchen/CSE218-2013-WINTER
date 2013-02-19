@@ -22,7 +22,7 @@ $(document).ready(function() {
 					url: '/users:' + encodeURIComponent(user_ids[source.options[i].text]),
 					type: 'PUT',
 					contentType: 'application/json',
-					data: { roles: ['fan']},
+					data: { "roles":{ "add":["fan"], "remove":["official"]}},
 				});
 			
 
@@ -45,7 +45,7 @@ $(document).ready(function() {
 					url: '/users:' + encodeURIComponent(user_ids[source.options[i].text]),
 					type: 'PUT',
 					contentType: 'application/json',
-					data: { roles: ['official']},
+					data: { "roles":{ "add":["official"], "remove":["fan"]}},
 				});
 			
 	
