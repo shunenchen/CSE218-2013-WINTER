@@ -505,6 +505,7 @@
 (def teamTable     "Team_Table")
 (def pastGameTable "Past_Game_Table")
 (def liveGameTable "Live_Game_Table")
+(def userTable     "User_Table")
 
 (defn get-all-players
   []
@@ -554,12 +555,11 @@
 
 (defn live-game-exists?
   [gameId]
-  (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
+    (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
 
 (defn game-running?
   [gameId]
-  ;is there a start game event for this gameId already? - dynamo scan
-  false)
+    (< 0 (count (filter #(= "{:type :start}" %) (map :event (with-client client (query liveGameTable gameId {})))))))
 
 (defn convert-realTime
   [dateTime]
@@ -605,12 +605,12 @@
 (defn get-users
   "return all users"
   []
-  (vec (vals @users)))
+    (with-client client (scan userTable {})))
 
 (defn get-user
   "id is google identity, return that user"
   [id]
-  (@users id))
+    (filter #(= (:googleID %) id) (get-users)))
 
 (defn create-user
   [m]

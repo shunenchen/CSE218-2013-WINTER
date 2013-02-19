@@ -48,7 +48,7 @@
 (defapi get-events
   "Get a list of all game events for a particular game"
   [gameId]
-  (db/get-game-events gameId))
+  (db/get-gameEvents gameId))
 
 (defapi get-player-stats
   "Get a list of all stats for this player
