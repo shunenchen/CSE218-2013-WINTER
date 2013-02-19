@@ -569,7 +569,7 @@
   [gameClock]
   (format "%07d" gameClock))
 
-(defn add-gameEvent
+(defn add-game-event
   [gameId gameClock gameEvent]
   (with-client client
       (put-item liveGameTable 
@@ -577,17 +577,18 @@
 	  :game_clock_uuid (str (convert-gameClock gameClock) \- (uuid)) 
           :event (str gameEvent)})))
 
-;(defn test-gameEvents
+;(defn test-game-events
 ;  []
-;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 0 {:type :start})
-;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 60000 {:type :shot :player "John Mangan"})
-;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 75000 {:type :penalty :player "David Srour"})
-;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 200000 {:type :shot :player "Samuel Chen"})
-;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 220000 {:type :shot :player "John Mangan"})
-;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 260000 {:type :penalty :player "Ben Ellis"})
-;  (add-gameEvent (game-id 2012 2 7 "19:30" "SD" "LA") 3600000 {:type :end}))
+;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 0 {:type :start})
+;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 60000 {:type :shot :player "John Mangan"})
+;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 75000 {:type :penalty :player "David Srour"})
+;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 200000 {:type :shot :player "Samuel Chen"})
+;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 220000 {:type :shot :player "John Mangan"})
+;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 260000 {:type :penalty :player "Ben Ellis"})
+;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 3600000 {:type :end}))
 
-(defn get-gameEvents
+(defn get-game-events
+  "Returns game events for the given game, which can take 0-2 game clock parameters as milliseconds since the game started (0: all events, 1: later than or equal time, 2: between clock values - inclusive of the first clock)."
   ([gameId]
     (with-client client (query liveGameTable gameId {})))
   ([gameId gameClock]
@@ -600,29 +601,35 @@
       [:BETWEEN (convert-gameClock gameClockStart)
         (convert-gameClock gameClockEnd)]}))))
 
-(def users (atom {}))
-
 (defn get-users
-  "return all users"
+  "Returns a lazy sequence of users."
   []
-    (with-client client (scan userTable {})))
+    (map read-string (map :cmap (with-client client (scan userTable {}))))
 
 (defn get-user
-  "id is google identity, return that user"
+  "Returns the first user with the given google id, or nil if one doesn't exist."
   [id]
-    (filter #(= (:googleID %) id) (get-users)))
+    (let [user (with-client client (get-item userTable {:hash_key id}))]
+      (if (nil? user) nil (read-string (:cmap user)))))
 
 (defn create-user
+  "m is a map with an :identity key" 
   [m]
-  ((swap! users assoc (:identity m)
-          (assoc m :roles #{:admin}))
-   (:identity m)))
+    (with-client client
+      (put-item userTable
+        {:identity (:identity m)
+	 :cmap (str m)})))
 
 (defn update-user
-  "FIXME: do something useful"
-  [user roles]
-  ((swap! users update-in [user] assoc :roles roles)
-   user))
+  "m is a map with an :identity key"
+  [m]
+    (with-client client
+      (update-item userTable {:hash_key (:identity m)} {:cmap (str m)})))
+
+(defn delete-user
+  "Deletes the user with the given id"
+  [id]
+    (with-client client (delete-item userTable {:hash_key id})))
 
 (defn create-game
   "FIXME: do something useful"
@@ -633,10 +640,5 @@
 (defn get-player-events
   "FIXME: get all events for the given player"
   [player]
-  {})
-
-(defn get-game-events
-  "FIXME: get all events for game gameId"
-  [gameId]
   {})
 
