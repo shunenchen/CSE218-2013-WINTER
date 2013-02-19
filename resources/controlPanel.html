@@ -19,10 +19,9 @@ $(document).ready(function() {
 			if(source.options[i].selected){			  	
 			
 				$.ajax({
-					url: '/users:' + encodeURIComponent(user_ids[source.options[i].text]),
-					type: 'PUT',
-					contentType: 'application/json',
-					data: { "roles":{ "add":["fan"], "remove":["official"]}},
+					url: '/users/' + encodeURIComponent(user_ids[source.options[i].text]),
+					type: 'PUT',					
+					data: {roles:{ add:["fan"], remove:["official"]}}
 				});
 			
 
@@ -44,7 +43,6 @@ $(document).ready(function() {
 				$.ajax({
 					url: '/users:' + encodeURIComponent(user_ids[source.options[i].text]),
 					type: 'PUT',
-					contentType: 'application/json',
 					data: { "roles":{ "add":["official"], "remove":["fan"]}},
 				});
 			
