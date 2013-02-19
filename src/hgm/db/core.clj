@@ -506,41 +506,33 @@
 (def pastGameTable "Past_Game_Table")
 (def liveGameTable "Live_Game_Table")
 
+(defn get-all-players
+  []
+    (with-client client (scan playerTable {})))
+
+(defn get-active-players
+  []
+    (filter #(= "RECENT" (:date-time-uuid %)) (get-all-players)))
+
+(defn get-roster
+  [team]
+    (filter #(= team (:team %)) (get-active-players)))
+
+(defn get-roster-by-position
+  [team position]
+    (filter #(= position (:position %)) (get-roster team)))
+
 (defn get-forwards
   [team]
-  (with-client client
-        (query playerTable team {:range_condition [:BEGINS_WITH "F_"]})))
+    (get-roster-by-position team "forward"))
 
 (defn get-defenders
   [team]
-  (with-client client
-        (query playerTable team {:range_condition [:BEGINS_WITH "D_"]})))
+    (get-roster-by-position team "defender"))
 
 (defn get-goalies
   [team]
-  (with-client client
-        (query playerTable team {:range_condition [:BEGINS_WITH "G_"]})))
-
-(defn get-roster
- [team]
-  (with-client client
-         (query playerTable team {})))
-
-(defn get-forwards-names
-    [team]
-    (map :player_name (get-forwards team)))
-
-(defn get-defenders-names
-    [team]
-    (map :player_name (get-defenders team)))
-
-(defn get-goalies-names
-    [team]
-    (map :player_name (get-goalies team)))
-
-(defn get-roster-names
-    [team]
-    (map :player_name (get-roster team)))
+    (get-roster-by-position team "goalie"))
 
 ;; FIXME: ignore the implementation of the next two functions, but we need "real" versions of them
 (defn get-player-career-stats
@@ -557,7 +549,7 @@
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
-  (str year \_ (format "%02d" month) \_ (format "%02d" day) \_ startTime \_
+  (str year \- (format "%02d" month) \- (format "%02d" day) \- startTime \-
        awayTeam \@ homeTeam))
 
 (defn live-game-exists?
@@ -569,6 +561,10 @@
   ;is there a start game event for this gameId already? - dynamo scan
   false)
 
+(defn convert-realTime
+  [dateTime]
+  (format "%013d" dateTime))
+
 (defn convert-gameClock
   [gameClock]
   (format "%07d" gameClock))
@@ -576,9 +572,9 @@
 (defn add-gameEvent
   [gameId gameClock gameEvent]
   (with-client client
-      (put-item liveGameTable
-        { :game_ID gameId
-          :game_clock_uuid (str (convert-gameClock gameClock) \_ (uuid))
+      (put-item liveGameTable 
+	{ :game_ID gameId
+	  :game_clock_uuid (str (convert-gameClock gameClock) \- (uuid)) 
           :event (str gameEvent)})))
 
 ;(defn test-gameEvents

@@ -23,22 +23,22 @@
 (defapi get-forwards
   "Get a list of all forwards in `team'."
   [team]
-  (db/get-forwards team))
+  (map :name (db/get-forwards team)))
 
 (defapi get-defenders
   "Get a list of all defense in `team'."
   [team]
-  (db/get-defenders team))
+  (map :name (db/get-defenders team)))
 
 (defapi get-goalies
   "Get a list of all goalies in `team'."
   [team]
-  (db/get-goalies team))
+  (map :name (db/get-goalies team)))
 
 (defapi get-roster
   "Get the roster of `team'."
   [team]
-  (db/get-roster team))
+  (map :name (db/get-roster team)))
 
 (defapi get-users
   "Get a list of all users in the system."
