@@ -613,23 +613,28 @@
       (if (nil? user) nil (read-string (:cmap user)))))
 
 (defn create-user
-  "m is a map with an :identity key" 
+  "m is a map with an :identity key. Returns the user." 
   [m]
-    (with-client client
-      (put-item userTable
-        {:identity (:identity m)
-	 :cmap (str m)})))
+    (let [u (assoc m :role :admin)]
+      (with-client client
+        (put-item userTable
+          {:identity (:identity u)
+	   :cmap (str u)}))
+      u))
 
 (defn update-user
-  "m is a map with an :identity key"
-  [m]
-    (with-client client
-      (update-item userTable {:hash_key (:identity m)} {:cmap (str m)})))
+  "m is a map with an :identity key. Returns the user."
+  [userId role]
+    (let [u (assoc (get-user userId) :role role)]
+      (with-client client
+        (update-item userTable {:hash_key userId} {:cmap (str u)}))
+      u))
 
 (defn delete-user
   "Deletes the user with the given id"
   [id]
-    (with-client client (delete-item userTable {:hash_key id})))
+    (with-client client (delete-item userTable {:hash_key id}))
+    nil)
 
 (defn create-game
   "FIXME: do something useful"
