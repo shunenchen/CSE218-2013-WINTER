@@ -4,7 +4,7 @@
 
 (defn update-player-goal-stats
   [stats player event]
-  (if (= player (:player event))
+  (if (= (:id player) (:player event))
     (update-in stats [:goals] inc)
     stats))
 
@@ -24,8 +24,16 @@
                    :goal (-> stats
                              (update-player-goal-stats player event)
                              (update-player-plus-minus-stats player event))
+                   :on-ice (if (= (:player event) (:id player))
+                             (assoc stats :on-ice true)
+                             stats)
+                   :off-ice (if (= (:player event) (:id player))
+                              (assoc stats :on-ice false)
+                              stats)
                    ))
-               {:on-ice false}
+               {:on-ice false
+                :goals 0
+                :plus-minus 0}
                events)]
     (dissoc stats :on-ice)))
 
