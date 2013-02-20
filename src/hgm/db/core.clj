@@ -81,9 +81,9 @@
 (defn add-game-event
   [gameId gameClock gameEvent]
   (with-client client
-      (put-item liveGameTable 
-	{ :game_ID gameId
-	  :game_clock_uuid (str (convert-gameClock gameClock) \- (uuid)) 
+      (put-item liveGameTable
+        { :game_ID gameId
+          :game_clock_uuid (str (convert-gameClock gameClock) \- (uuid))
           :event (str gameEvent)})))
 
 ;(defn test-game-events
@@ -122,19 +122,19 @@
       (if (nil? user) nil (read-string (:cmap user)))))
 
 (defn create-user
-  "m is a map with an :identity key. Returns the user." 
+  "m is a map with an :identity key. Returns the user."
   [m]
-    (let [u (assoc m :role :admin)]
+    (let [u (assoc m :roles #{:official})]
       (with-client client
         (put-item userTable
           {:identity (:identity u)
-	   :cmap (str u)}))
+           :cmap (str u)}))
       u))
 
 (defn update-user
   "m is a map with an :identity key. Returns the user."
-  [userId role]
-    (let [u (assoc (get-user userId) :role role)]
+  [userId roles]
+    (let [u (assoc (get-user userId) :roles roles)]
       (with-client client
         (update-item userTable {:hash_key userId} {:cmap (str u)}))
       u))

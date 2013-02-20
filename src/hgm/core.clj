@@ -20,7 +20,7 @@
 (defroutes hgm-routes
   (GET  "/" request
         (io/file
-         (if (friend/authorized? #{:admin} friend/*identity*)
+         (if (friend/authorized? #{:official} friend/*identity*)
            "resources/controlPanel.html"
            (if (friend/authorized? #{:official} friend/*identity*)
              "resources/hockey.html"
@@ -42,7 +42,7 @@
   (GET  "/users"                    []     (api/get-users))
   (PUT  "/users/:user"              [user roles]
         (friend/authorize #{:official}
-           (api/update-user user roles)))
+           (api/update-user user (into #{} (map keyword roles)))))
 
   (POST "/events/start-game"        [home away]
         (friend/authorize #{:official}
