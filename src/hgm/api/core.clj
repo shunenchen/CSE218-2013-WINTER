@@ -50,12 +50,12 @@
   [gameId]
   (db/get-game-events gameId))
 
-(defapi get-player-stats
+(defapi get-player-career-stats
   "Get a list of all stats for this player
   stats currently supported
     * plus-minus"
   [player]
-  (db/get-player-events player))
+  (get-player-stats-internal player))
 
 
 (defapi update-user

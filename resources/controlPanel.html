@@ -21,7 +21,7 @@ $(document).ready(function() {
 				$.ajax({
 					url: '/users/' + encodeURIComponent(user_ids[source.options[i].text]),
 					type: 'PUT',					
-					data: {roles:{ add:["fan"], remove:["official"]}}
+					data: {roles:["fan"]}
 				});
 			
 
@@ -41,9 +41,9 @@ $(document).ready(function() {
 			if(source.options[i].selected){			  
 							
 				$.ajax({
-					url: '/users:' + encodeURIComponent(user_ids[source.options[i].text]),
+					url: '/users/' + encodeURIComponent(user_ids[source.options[i].text]),
 					type: 'PUT',
-					data: { "roles":{ "add":["official"], "remove":["fan"]}},
+					data: { "roles":["official"]}
 				});
 			
 	
@@ -59,11 +59,12 @@ window.onload=function() {
 	$.getJSON("/users", function(data,status) 
 	{		
 		for (var i = 0; i < data["data"].length; i++) { 
-			if ("admin" == data["data"][i]["roles"] || "officials" == data["data"][i]["roles"]) {
+			if ("official" == data["data"][i]["roles"]) {
 				target = document.getElementById('selectOfficials');
    				target.options[target.options.length]=new Option(data["data"][i]["email"]);
 			}
-			else if ("fan" == data["data"][i]["roles"] || "fan" == data["data"][i]["roles"]) {
+                        // if not official, must be a fan
+			else {
 				target = document.getElementById('selectFans');
    				target.options[target.options.length]=new Option(data["data"][i]["email"]);
 			}

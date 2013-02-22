@@ -20,11 +20,11 @@
 (defroutes hgm-routes
   (GET  "/" request
         (io/file
-         (if (friend/authorized? #{:admin} friend/*identity*)
+         (if (friend/authorized? #{:official} friend/*identity*)
            "resources/controlPanel.html"
            (if (friend/authorized? #{:official} friend/*identity*)
              "resources/hockey.html"
-             "resources/login.html"))))
+             "resources/fanInterface.html"))))
 
   ; roster
   (GET  "/teams/:team/get-forwards" [team] (api/get-forwards team))
@@ -33,7 +33,7 @@
   (GET  "/teams/:team/get-roster"   [team] (api/get-roster   team))
 
   ; stats
-  (GET  "/stats/players/:player"    [player] (api/get-player-stats player))
+  (GET  "/stats/players/:player"    [player] (api/get-player-career-stats player))
 
 
   (GET  "/games/:game/get-events"   [game] (api/get-events   game))
@@ -41,8 +41,8 @@
   ;; FIXME: /users should be admin-only, but we'll wait until we have a proper db
   (GET  "/users"                    []     (api/get-users))
   (PUT  "/users/:user"              [user roles]
-        (friend/authorize #{:admin}
-           (api/update-user user roles)))
+        (friend/authorize #{:official}
+           (api/update-user user (into #{} (map keyword roles)))))
 
   (POST "/events/start-game"        [home away]
         (friend/authorize #{:official}
@@ -85,7 +85,6 @@
                                   str)))
   (route/resources "/")
   (route/not-found "Page not found"))
-
 
 (defn check-creds
   [m]
