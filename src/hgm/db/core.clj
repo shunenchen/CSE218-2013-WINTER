@@ -15,6 +15,10 @@
 (def pastGameTable "Past_Game_Table")
 (def liveGameTable "Live_Game_Table")
 (def userTable     "User_Table")
+(def playerGameStatsTable "Player_Game_Stats_Table")
+(def gamePlayerStatsTable "Game_Player_Stats_Table")
+(def teamGameStatsTable "Team_Game_Stats_Table")
+
 
 (defn get-all-players
   []
@@ -51,11 +55,44 @@
    {:type :goal :player player :game-id "blah2" :team "Los Angeles" :time 60}
    {:type :on-ice :player player :game-id "blah" :time 100}])
 
+(defn add-player-game-stats
+  [playerId gameId stats]
+    (def entry {:player playerId :game gameId :stats (str stats)})
+    (with-client client
+	  (put-item playerGameStatsTable entry)
+	  (put-item gamePlayerStatsTable entry)))
+
 (defn get-player-game-stats
-  [player game]
-  [{:type :goal :player player :game-id game :team "Los Angeles" :time 50}
-   {:type :goal :player player :game-id game :team "Los Angeles" :time 60}
-   {:type :on-ice :player player :game-id game :time 100}])
+  "Gets stats for the given player over all games or an individual game."
+  ([playerId]
+    (get-player-game-stats playerId nil))
+  ([playerId gameId]
+    (into [] (map (fn [x] (read-string (:stats x)))
+      (with-client client (query playerGameStatsTable playerId
+	    (if (nil? gameId) {} {:range_condition [:EQ gameId]})))))))
+
+(defn get-game-player-stats
+  "Gets all the stats of a game for all players or an individual player."
+  ([gameId]
+    (get-game-player-stats gameId nil))
+  ([gameId playerId]
+    (into [] (map (fn [x] (read-string (:stats x)))
+      (with-client client (query gamePlayerStatsTable gameId
+	    (if (nil? playerId) {} {:range_condition [:EQ playerId]})))))))
+
+(defn add-team-game-stats
+  [team gameId stats]
+    (with-client client (put-item teamGameStatsTable
+	  {:team team :game gameId :stats (str stats)})))
+		
+(defn get-team-game-stats
+  "Get stats for all games the team has played in or for an individual game."
+  ([team]
+    (get-team-game-stats team nil))
+  ([team gameId]
+    (map (fn [x] (read-string (:stats x)))
+	  (with-client client (query teamGameStatsTable team 
+	    (if (nil? gameId) {} {:range_condition [:EQ gameId]}))))))
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
@@ -113,7 +150,7 @@
 (defn get-users
   "Returns a lazy sequence of users."
   []
-    (map read-string (map :cmap (with-client client (scan userTable {})))))
+    (map (fn [x] (read-string (:cmap x))) (with-client client (scan userTable {}))))
 
 (defn get-user
   "Returns the first user with the given google id, or nil if one doesn't exist."
