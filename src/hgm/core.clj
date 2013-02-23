@@ -87,10 +87,9 @@
   (route/not-found "Page not found"))
 
 (defn check-creds
-  [m]
-  (if-let [user (db/get-user (:identity m))]
-    (merge m user)
-    (merge m (db/create-user m))))
+  [user]
+  (merge user (or (db/get-user (:identity user))
+                  (db/create-user user))))
 
 (def app
   (-> hgm-routes
