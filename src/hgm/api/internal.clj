@@ -4,21 +4,21 @@
 
 (defn update-goal-stats
   [stats player event]
-  (if (= (:id player) (:player event))
+  (if (= (:id player) (:playerId event))
     (update-in stats [:goals] inc)
     stats))
 
 (defn update-plus-minus-stats
   [stats player event]
   (if (:on-ice stats)
-    (if (= (:team player) (:team event))
+    (if (= (:teamId player) (:teamId event))
       (update-in stats [:plus-minus] inc)
       (update-in stats [:plus-minus] dec))
     stats))
 
 (defn exit-ice
   [stats player event]
-   (if (= (:player event) (:id player))
+   (if (= (:playerId event) (:id player))
      (-> stats
          (assoc :on-ice false)
          (update-in [:time-on-ice] #(+ % (- (:time event) (:last-entered stats)))))
@@ -26,10 +26,9 @@
 
 (defn enter-ice
   [stats player event]
-  (if (= (:player event) (:id player))
-    (-> stats
-        (assoc :on-ice true)
-        (assoc :last-entered (:time event)))
+  (if (= (:playerId event) (:id player))
+    (assoc stats :on-ice true
+                 :last-entered (:time event))
     stats))
 
 (defn compute-player-stats

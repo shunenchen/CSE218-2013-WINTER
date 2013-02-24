@@ -99,7 +99,7 @@
 ;; the add-X-event functions are stubs and do not reflect an actual api...
 (defapi add-start-game-event
   "Start a game."
-  [gameId startTime homePlayers awayPlayers]
+  [gameId startTime home away]
   (if (or (not (db/unarchived-game-exists? gameId)) (db/game-started? gameId))
     (throw (Exception. "GAME ALREADY STARTED / NON-EXISTANT"))
     (do (db/add-game-event gameId 0 {:type :start
