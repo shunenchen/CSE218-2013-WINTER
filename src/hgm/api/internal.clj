@@ -43,5 +43,5 @@
   ([player game]
      (if (db/live-game-exists? game)
        (let [events (db/get-game-events game)]
-         (compute-player-stats player events))
+         (compute-player-stats (db/get-player player) events))
        (db/get-player-game-stats player game))))

@@ -28,6 +28,11 @@
   []
     (filter #(= "RECENT" (:date-time-uuid %)) (get-all-players)))
 
+;; FIXME: need a way to get a single player's data by uuid
+(defn get-player
+  [player]
+  {})
+
 (defn get-roster
   [team]
     (filter #(= team (:team %)) (get-active-players)))
@@ -134,18 +139,26 @@
 ;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 3600000 {:type :end}))
 
 (defn get-game-events
-  "Returns game events for the given game, which can take 0-2 game clock parameters as milliseconds since the game started (0: all events, 1: later than or equal time, 2: between clock values - inclusive of the first clock)."
+  "Returns game events for the given game, which can take 0-2 game
+  clock parameters as milliseconds since the game started
+
+  0: all events
+  1: later than or equal time
+  2: between clock values - inclusive of the first clock)."
   ([gameId]
-    (with-client client (query liveGameTable gameId {})))
+     (map #(update-in % [:event] read-string)
+          (with-client client (query liveGameTable gameId {}))))
   ([gameId gameClock]
     ; Will return inclusive such as a >= due to UUIDs
-    (with-client client (query liveGameTable gameId
-      {:range_condition [:GT (convert-gameClock gameClock)]})))
+     (map #(update-in % [:event] read-string)
+          (with-client client (query liveGameTable gameId {:range_condition
+            [:GT (convert-gameClock gameClock)]}))))
   ([gameId gameClockStart gameClockEnd]
     ; Will return inclusive of the start, exclusive of the end time
-    (with-client client (query liveGameTable gameId {:range_condition
-      [:BETWEEN (convert-gameClock gameClockStart)
-        (convert-gameClock gameClockEnd)]}))))
+     (map #(update-in % [:event] read-string)
+          (with-client client (query liveGameTable gameId {:range_condition
+            [:BETWEEN (convert-gameClock gameClockStart)
+             (convert-gameClock gameClockEnd)]})))))
 
 (defn get-users
   "Returns a lazy sequence of users."

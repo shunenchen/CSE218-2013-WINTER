@@ -48,15 +48,21 @@
 (defapi get-events
   "Get a list of all game events for a particular game"
   [gameId]
-  (db/get-game-events gameId))
+  {:events (db/get-game-events gameId)})
 
 (defapi get-player-career-stats
   "Get a list of all stats for this player
   stats currently supported
     * plus-minus"
-  [player]
-  (get-player-stats-internal player))
+  [playerId]
+  (get-player-stats-internal playerId))
 
+(defapi get-player-game-stats
+  "Get a list of all stats for this player
+  stats currently supported
+    * plus-minus"
+  [playerId gameId]
+  (get-player-stats-internal playerId gameId))
 
 (defapi update-user
   "Update a user with some attributes."

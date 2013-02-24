@@ -33,10 +33,11 @@
   (GET  "/teams/:team/get-roster"   [team] (api/get-roster   team))
 
   ; stats
-  (GET  "/stats/players/:player"    [player] (api/get-player-career-stats player))
+  (GET  "/players/:playerId/stats"  [playerId] (api/get-player-career-stats playerId))
+  (GET  "/players/:playerId/stats/for-game/:gameId" [playerId gameId]
+        (api/get-player-game-stats playerId gameId))
 
-
-  (GET  "/games/:game/get-events"   [game] (api/get-events   game))
+  (GET  "/games/:gameId/events"     [gameId] (api/get-events gameId))
 
   ;; FIXME: /users should be admin-only, but we'll wait until we have a proper db
   (GET  "/users"                    []     (api/get-users))
