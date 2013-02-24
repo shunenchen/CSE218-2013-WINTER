@@ -64,8 +64,8 @@
   [playerId gameId stats]
     (def entry {:player playerId :game gameId :stats (str stats)})
     (with-client client
-	  (put-item playerGameStatsTable entry)
-	  (put-item gamePlayerStatsTable entry)))
+      (put-item playerGameStatsTable entry)
+      (put-item gamePlayerStatsTable entry)))
 
 (defn get-player-game-stats
   "Gets stats for the given player over all games or an individual game."
@@ -74,7 +74,7 @@
   ([playerId gameId]
     (into [] (map (fn [x] (read-string (:stats x)))
       (with-client client (query playerGameStatsTable playerId
-	    (if (nil? gameId) {} {:range_condition [:EQ gameId]})))))))
+        (if (nil? gameId) {} {:range_condition [:EQ gameId]})))))))
 
 (defn get-game-player-stats
   "Gets all the stats of a game for all players or an individual player."
@@ -83,21 +83,21 @@
   ([gameId playerId]
     (into [] (map (fn [x] (read-string (:stats x)))
       (with-client client (query gamePlayerStatsTable gameId
-	    (if (nil? playerId) {} {:range_condition [:EQ playerId]})))))))
+        (if (nil? playerId) {} {:range_condition [:EQ playerId]})))))))
 
 (defn add-team-game-stats
   [team gameId stats]
     (with-client client (put-item teamGameStatsTable
-	  {:team team :game gameId :stats (str stats)})))
-		
+      {:team team :game gameId :stats (str stats)})))
+        
 (defn get-team-game-stats
   "Get stats for all games the team has played in or for an individual game."
   ([team]
     (get-team-game-stats team nil))
   ([team gameId]
     (map (fn [x] (read-string (:stats x)))
-	  (with-client client (query teamGameStatsTable team 
-	    (if (nil? gameId) {} {:range_condition [:EQ gameId]}))))))
+      (with-client client (query teamGameStatsTable team 
+        (if (nil? gameId) {} {:range_condition [:EQ gameId]}))))))
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
@@ -107,8 +107,8 @@
 (defn get-unarchived-game-ids
   []
     (map :game_ID (into #{} (with-client client
-	  (scan liveGameTable {:attributes_to_get ["game_ID"]})))))
-	   
+      (scan liveGameTable {:attributes_to_get ["game_ID"]})))))
+       
 (defn unarchived-game-exists?
   [gameId]
     (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
@@ -116,12 +116,12 @@
 (defn game-started?
   [gameId]
     (< 0 (count (filter #(= "{:type :start}" %)
-	  (map :event (with-client client (query liveGameTable gameId {})))))))
+      (map :event (with-client client (query liveGameTable gameId {})))))))
 
 (defn game-ended?
   [gameId]
     (< 0 (count (filter #(= "{:type :end}" %)
-	  (map :event (with-client client (query liveGameTable gameId {})))))))
+      (map :event (with-client client (query liveGameTable gameId {})))))))
 
 (defn convert-realTime
   [dateTime]
@@ -138,6 +138,19 @@
         { :game_ID gameId
           :game_clock_uuid (str (convert-gameClock gameClock) \- (uuid))
           :event (str gameEvent)})))
+
+(defn remove-game-event
+  [gameId gameClockWithUuid]
+   (with-client client (delete-item liveGameTable
+     {:hash_key gameId :range_key gameClockWithUuid})))
+          
+(defn update-game-event
+  "Updates a game event, optimized if the game-clock does not change."
+  ([gameId gameClockWithUuid gameEvent]
+    (with-client client (update-item liveGameTable {:hash_key gameId :range_key gameClockWithUuid} {:event (str gameEvent)} {})))
+  ([gameId oldGameClockWithUuid gameEvent newGameClock]
+    (remove-game-event gameId oldGameClockWithUuid)
+    (add-game-event gameId newGameClock gameEvent)))
 
 ;(defn test-game-events
 ;  []
