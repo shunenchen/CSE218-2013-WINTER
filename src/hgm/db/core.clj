@@ -139,6 +139,19 @@
           :game_clock_uuid (str (convert-gameClock gameClock) \- (uuid))
           :event (str gameEvent)})))
 
+(defn remove-game-event
+  [gameId gameClockWithUuid]
+   (with-client client (delete-item liveGameTable
+     {:hash_key gameId :range_key gameClockWithUuid})))
+          
+(defn update-game-event
+  "Updates a game event, optimized if the game-clock does not change."
+  ([gameId gameClockWithUuid gameEvent]
+    (with-client client (update-item liveGameTable {:hash_key gameId :range_key gameClockWithUuid} {:event (str gameEvent)} {})))
+  ([gameId oldGameClockWithUuid gameEvent newGameClock]
+    (remove-game-event gameId oldGameClockWithUuid)
+    (add-game-event gameId newGameClock gameEvent)))
+
 ;(defn test-game-events
 ;  []
 ;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 0 {:type :start})
