@@ -37,7 +37,14 @@
   (GET  "/players/:playerId/stats/for-game/:gameId" [playerId gameId]
         (api/get-player-game-stats playerId gameId))
 
+  ;; games
+  (POST "/games"                    [startTime home away]
+        (friend/authorize #{:official}
+           (api/create-game startTime home away)))
   (GET  "/games/:gameId/events"     [gameId] (api/get-events gameId))
+  (POST "/games/:gameId/archive"    [gameId]
+        (friend/authorize #{:official}
+           (api/archive-game gameId)))
 
   ;; FIXME: /users should be admin-only, but we'll wait until we have a proper db
   (GET  "/users"                    []     (api/get-users))
@@ -45,9 +52,9 @@
         (friend/authorize #{:official}
            (api/update-user user (into #{} (map keyword roles)))))
 
-  (POST "/events/start-game"        [home away]
+  (POST "/events/start-game"        [gameId startTime home away]
         (friend/authorize #{:official}
-           (api/add-start-game-event home away)))
+           (api/add-start-game-event gameId startTime home away)))
 
   (POST "/events/swap-players"      [gameId time outPlayer inPlayer]
         (friend/authorize #{:official}
@@ -57,21 +64,21 @@
         (friend/authorize #{:official}
            (api/add-end-game-event gameId time)))
 
-  (POST "/events/shot"              [gameId time player]
+  (POST "/events/shot"              [gameId time playerId]
         (friend/authorize #{:official}
-           (api/add-shot-event gameId time player)))
+           (api/add-shot-event gameId time playerId)))
 
   ; assists is a list of up to two player ids
-  (POST "/events/goal"              [gameId time player assists]
+  (POST "/events/goal"              [gameId time playerId assists]
         (friend/authorize #{:official}
-           (api/add-goal-event gameId time player assists)))
+           (api/add-goal-event gameId time playerId assists)))
 
   ; penalty is a map that includes penalty type, and all other relevant
   ; information for the penalty
-  ; FIXME : hash out with Cam
-  (POST "/events/penalty"              [gameId time player penalty]
+  ; FIXME: hash out with Cam
+  (POST "/events/penalty"              [gameId time playerId penalty]
         (friend/authorize #{:official}
-           (api/add-penalty-event gameId time player penalty)))
+           (api/add-penalty-event gameId time playerId penalty)))
 
 
   (GET "/login" request (io/file "resources/login.html"))
