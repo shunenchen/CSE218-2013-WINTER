@@ -41,7 +41,7 @@
   ([player]
      (db/get-player-career-stats player))
   ([player game]
-     (if (db/live-game-exists? game)
+     (if (db/unarchived-game-exists? game)
        (let [events (db/get-game-events game)]
          (compute-player-stats (db/get-player player) events))
        (db/get-player-game-stats player game))))

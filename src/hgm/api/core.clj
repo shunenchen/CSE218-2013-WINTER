@@ -73,7 +73,7 @@
 (defapi add-start-game-event
   "Start a game."
   [gameId startTime homePlayers awayPlayers]
-  (if (or (not (db/live-game-exists? gameId)) (db/game-running? gameId))
+  (if (or (not (db/unarchived-game-exists? gameId)) (db/game-started? gameId))
     (throw (Exception. "GAME ALREADY STARTED / NON-EXISTANT"))
     (do (db/add-game-event gameId 0 {:type :start :time startTime})
         (doseq [p (concat homePlayers awayPlayers)]
