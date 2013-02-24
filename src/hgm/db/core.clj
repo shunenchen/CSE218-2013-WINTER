@@ -104,6 +104,11 @@
   (str year \- (format "%02d" month) \- (format "%02d" day) \- startTime \-
        awayTeam \@ homeTeam))
 
+(defn get-unarchived-game-ids
+  []
+    (map :game_ID (into #{} (with-client client
+	  (scan liveGameTable {:attributes_to_get ["game_ID"]})))))
+	   
 (defn unarchived-game-exists?
   [gameId]
     (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
