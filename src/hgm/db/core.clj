@@ -104,13 +104,19 @@
   (str year \- (format "%02d" month) \- (format "%02d" day) \- startTime \-
        awayTeam \@ homeTeam))
 
-(defn live-game-exists?
+(defn unarchived-game-exists?
   [gameId]
     (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
 
-(defn game-running?
+(defn game-started?
   [gameId]
-    (< 0 (count (filter #(= "{:type :start}" %) (map :event (with-client client (query liveGameTable gameId {})))))))
+    (< 0 (count (filter #(= "{:type :start}" %)
+	  (map :event (with-client client (query liveGameTable gameId {})))))))
+
+(defn game-ended?
+  [gameId]
+    (< 0 (count (filter #(= "{:type :end}" %)
+	  (map :event (with-client client (query liveGameTable gameId {})))))))
 
 (defn convert-realTime
   [dateTime]
