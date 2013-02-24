@@ -2,18 +2,34 @@
   (:require [hgm.db.core :as db]))
 
 
-(defn update-player-goal-stats
+(defn update-goal-stats
   [stats player event]
   (if (= (:id player) (:player event))
     (update-in stats [:goals] inc)
     stats))
 
-(defn update-player-plus-minus-stats
+(defn update-plus-minus-stats
   [stats player event]
   (if (:on-ice stats)
     (if (= (:team player) (:team event))
       (update-in stats [:plus-minus] inc)
       (update-in stats [:plus-minus] dec))
+    stats))
+
+(defn exit-ice
+  [stats player event]
+   (if (= (:player event) (:id player))
+     (-> stats
+         (assoc :on-ice false)
+         (update-in [:time-on-ice] #(+ % (- (:time event) (:last-entered stats)))))
+     stats))
+
+(defn enter-ice
+  [stats player event]
+  (if (= (:player event) (:id player))
+    (-> stats
+        (assoc :on-ice true)
+        (assoc :last-entered (:time event)))
     stats))
 
 (defn compute-player-stats
@@ -22,20 +38,17 @@
                (fn [stats event]
                  (case (:type event)
                    :goal (-> stats
-                             (update-player-goal-stats player event)
-                             (update-player-plus-minus-stats player event))
-                   :on-ice (if (= (:player event) (:id player))
-                             (assoc stats :on-ice true)
-                             stats)
-                   :off-ice (if (= (:player event) (:id player))
-                              (assoc stats :on-ice false)
-                              stats)
+                             (update-goal-stats player event)
+                             (update-plus-minus-stats player event))
+                   :enter-ice (enter-ice stats player event)
+                   :exit-ice (exit-ice stats player event)
                    ))
                {:on-ice false
                 :goals 0
-                :plus-minus 0}
+                :plus-minus 0
+                :time-on-ice 0}
                events)]
-    (dissoc stats :on-ice)))
+    (dissoc stats :on-ice :last-entered)))
 
 (defn get-player-stats-internal
   ([player]

@@ -19,6 +19,7 @@
              :body (if (map? r#) r# {:data r#})})
           (catch java.lang.Throwable t# {:status 500 :body (.getMessage t#)}))))
 
+;;;; Players
 
 (defapi get-forwards
   "Get a list of all forwards in `team'."
@@ -40,10 +41,41 @@
   [team]
   (map :name (db/get-roster team)))
 
+
+;;;; Users
+
 (defapi get-users
   "Get a list of all users in the system."
    []
   (db/get-users))
+
+(defapi update-user
+  "Update a user with some attributes."
+  [user roles]
+  (db/update-user user roles))
+
+
+;;;; Events / Stats
+
+(defapi create-game
+  "Create a game between `home' and `away', starting at `startTime'."
+  [startTime home away]
+  (db/create-game startTime home away))
+
+(defapi archive-game
+  "Archive `gameId'. Computes a full set of stats and stores them for later use.
+
+  - game-stats per player
+  - update player career stats
+  - game summary"
+  [gameId]
+  (let [[start & events] (db/get-game-events gameId)
+        player-ids (concat (:roster (:home start)) (:roster (:away start)))
+;        player-stats (map #(compute-player-stats % events) player-ids)
+        ]
+
+    (comment (doseq player-ids
+               ))))
 
 (defapi get-events
   "Get a list of all game events for a particular game"
@@ -64,28 +96,26 @@
   [playerId gameId]
   (get-player-stats-internal playerId gameId))
 
-(defapi update-user
-  "Update a user with some attributes."
-  [user roles]
-  (db/update-user user roles))
-
-;;; the add-X-event functions are stubs and do not reflect an actual api...
+;; the add-X-event functions are stubs and do not reflect an actual api...
 (defapi add-start-game-event
   "Start a game."
   [gameId startTime homePlayers awayPlayers]
   (if (or (not (db/unarchived-game-exists? gameId)) (db/game-started? gameId))
     (throw (Exception. "GAME ALREADY STARTED / NON-EXISTANT"))
-    (do (db/add-game-event gameId 0 {:type :start :time startTime})
-        (doseq [p (concat homePlayers awayPlayers)]
-          (db/add-game-event gameId 0 {:type :on-ice :player p})))))
+    (do (db/add-game-event gameId 0 {:type :start
+                                     :time startTime
+                                     :home (:roster home)
+                                     :away (:roster away)})
+        (doseq [p (concat (:starting home) (:starting away))]
+          (db/add-game-event gameId 0 {:type :enter-ice :playerId p})))))
 
 (defapi add-swap-players-event
   "Swap two players during a game."
   [gameId time outPlayer inPlayer]
   (db/add-game-event gameId time
-                    {:type :off-ice :player outPlayer})
+                    {:type :exit-ice :playerId outPlayer})
   (db/add-game-event gameId time
-                    {:type :in-ice :player inPlayer}))
+                    {:type :enter-ice :playerId inPlayer}))
 
 (defapi add-end-game-event
   "End a game."
@@ -94,16 +124,16 @@
 
 (defapi add-shot-event
   "Add a shot event."
-  [gameId time player]
-  (db/add-game-event gameId time {:type :shot :player player}))
+  [gameId time playerId]
+  (db/add-game-event gameId time {:type :shot :playerId playerId}))
 
 (defapi add-goal-event
   "Add a goal event. Assist is a list of up to 2 playerIds who assisted"
-  [gameId time player assists]
-  (db/add-game-event gameId time {:type :goal :player player :assists assists}))
+  [gameId time playerId assists]
+  (db/add-game-event gameId time {:type :goal :playerId playerId :assists assists}))
 
 (defapi add-penalty-event
   "add a penalty for a particular player
   different penalty types will have different additional data"
-  [gameId time player penalty]
-  (db/add-game-event gameId time {:type :goal :player player :penalty penalty}))
+  [gameId time playerId penalty]
+  (db/add-game-event gameId time {:type :goal :playerId playerId :penalty penalty}))
