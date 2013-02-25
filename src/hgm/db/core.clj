@@ -4,8 +4,6 @@
   (:use clojure.test)
   (:use hgm.db.clj_dynamo :reload))
 
-(defn uuid [] (str (java.util.UUID/randomUUID)))
-
 (def properties {:access_key (System/getenv "DYNAMODB_ACCESS_KEY") :secret_key (System/getenv "DYNAMODB_SECRET_KEY")})
 (def cred (select-keys properties [:access_key :secret_key]))
 (def client (create-ddb-client cred))
@@ -19,10 +17,9 @@
 (def gamePlayerStatsTable "Game_Player_Stats_Table")
 (def teamGameStatsTable "Team_Game_Stats_Table")
 
+(defn uuid [] (str (java.util.UUID/randomUUID)))
 
-(defn get-all-players
-  []
-    (with-client client (scan playerTable {})))
+(defn get-all-players [] (with-client client (scan playerTable {})))
 
 (defn get-active-players
   []
@@ -30,6 +27,7 @@
 
 ;; FIXME: need a way to get a single player's data by uuid
 (defn get-player
+  "Returns the player object which should have a :id (uuid) and :teamId (team uuid)."
   [player]
   {})
 
@@ -241,25 +239,40 @@
     nil)
 
 (defn create-game
-  "FIXME: do something useful"
-  [year month day startTime awayTeam homeTeam]
-  ;TODO do stuff here to setup game as necessary
-  (game-id year month day startTime awayTeam homeTeam))
+  "Input should be a map which includes the following keys:
+   :startTime (timestamp)
+   :homeTeam (team id)
+   :awayTeam (team id)"
+  [game]
+  ;TODO store game in a gametable
+  ;TODO fix game-id to make sense
+  ;(game-id year month day startTime awayTeam homeTeam)
+  "a-game-id")
 
-(defn get-player-events
-  "FIXME: get all events for the given player"
-  [player]
-  {})
-
+(defn get-game
+  [gameId]
+    ;do two queries (if necessary) to the game table, archived vs. unarchived
+ )
+   
 (defn set-game-summary
   "FIXME: DO IT"
   [gameId summary]
+    (let [game (get-game gameId)]
+       ;assoc the summary into game and store it
+       )      
   )
 
+;; TODO
+; check to make sure we have add/update/delete for players/users/teams/games/events
+  
 (defn archive-game
   "FIXME: delete from liveGameTable and update events attr in gameTable"
   [gameId events]
-  )
+    ;get game out of game table (unarchived)
+    ;assoc events into game
+    ;store game in game table (archived)
+    ;delete game events from the liveGameTable 
+   )
 
 (defn get-games
   "FIXME: get a list of ALL games, without their event-list"
