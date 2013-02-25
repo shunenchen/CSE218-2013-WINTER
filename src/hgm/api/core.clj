@@ -24,22 +24,22 @@
 (defapi get-forwards
   "Get a list of all forwards in `team'."
   [team]
-  (map :name (db/get-forwards team)))
+  (db/get-forwards team))
 
 (defapi get-defenders
   "Get a list of all defense in `team'."
   [team]
-  (map :name (db/get-defenders team)))
+  (db/get-defenders team))
 
 (defapi get-goalies
   "Get a list of all goalies in `team'."
   [team]
-  (map :name (db/get-goalies team)))
+  (db/get-goalies team))
 
 (defapi get-roster
   "Get the roster of `team'."
   [team]
-  (map :name (db/get-roster team)))
+  (db/get-roster team))
 
 
 ;;;; Users
@@ -61,6 +61,11 @@
   "Create a game between `home' and `away', starting at `startTime'."
   [startTime home away]
   (db/create-game startTime home away))
+
+(defapi get-games
+  "Get a list of all games, ignoring the game events."
+  []
+  (db/get-games))
 
 (defapi archive-game
   "Archive `gameId'. Computes a full set of stats and stores them for later use.
