@@ -2,25 +2,45 @@
 <html>
 <head>
 <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+<script src="epochUtils.js"></script>
 <title>Hockey Game Manager</title>
 <meta charset="UTF-8" />
 <link rel="stylesheet" type="text/css" href="reset.css">
 <link rel="stylesheet" type="text/css" href="fan_interface_structure.css">
 
 <script>
-var user_ids = {};
+var games_ids = {};
 
 $(document).ready(function() {
   	$("#show-event").click(function() {
 		source = document.getElementById('selectGame');
 		
 		for(var i=(source.options.length-1); i>=0; i--){
-			if(source.options[i].selected){			  	
-				 document.getElementById('event-box').value = source.options[i].text + "\n\n- Event1\n- Event2\n- Event3\n- Event4\n...\n...";
+			if(source.options[i].selected){		
+				$.getJSON("/games/"+games_ids[source.options[i].text]+"/events", function(data,status) 
+				{		
+					target = document.getElementById('event-box');
+					if (data["events"].length == 0)
+						target.value = "NO EVENTS :(";
+				});		  	
 			}	
 		}
   	});
 });	
+
+window.onload=function() {
+	// Populate DOMs
+	$.getJSON("/games", function(data,status) 
+	{		
+		target = document.getElementById('selectGame');
+   				
+		for (var i = 0; i < data["data"].length; i++) { 
+			var dom_txt = data["data"][i]["away"] + " @ " + data["data"][i]["home"] + " (" + EpochToDate(data["data"][i]["scheduled"]) + ")";
+			games_ids[dom_txt] = data["data"][i]["id"];
+			target.options[target.options.length]=new Option(dom_txt);
+		}      
+    });	
+};
 </script>
 
 </head>
@@ -33,17 +53,11 @@ $(document).ready(function() {
     
 	<content>	  
             <td align="left">Games:</td> </br>
-            <td align="left"><select name="selectGame" id="selectGame" style="width: 300px;">
-	            <option value="game1">Team1 vs Team2</option>
-                <option value="game2">Team3 vs Team4</option>	
-               	<option value="game3">Team5 vs Team6</option>	
-                <option value="game4">Team7 vs Team8</option>	
-                <option value="game5">Team9 vs Team10</option>	
+            <td align="left"><select name="selectGame" id="selectGame" style="width: 600px;">
             </select></td>
             <button type="submit" id="show-event" class="btn" style="visibility: visible">Update</button>
         	</br> 
             <textarea readonly id="event-box" rows="4" style="width: 940px; height: 450px; margin-top: 10px; resize: none;">
-blah blah blah event
             </textarea>          
 	</content>
     
