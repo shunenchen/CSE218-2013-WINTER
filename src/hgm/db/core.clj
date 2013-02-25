@@ -98,7 +98,7 @@
   [team gameId stats]
     (with-client client (put-item teamGameStatsTable
       {:team team :game gameId :stats (str stats)})))
-        
+
 (defn get-team-game-stats
   "Get stats for all games the team has played in or for an individual, specified game."
   ([team]
@@ -129,7 +129,7 @@
   []
     (map :game_ID (into #{} (with-client client
       (scan liveGameTable {:attributes_to_get ["game_ID"]})))))
-       
+
 (defn unarchived-game-exists?
   [gameId]
     (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
@@ -164,7 +164,7 @@
   [gameId gameClockWithUuid]
    (with-client client (delete-item liveGameTable
      {:hash_key gameId :range_key gameClockWithUuid})))
-          
+
 (defn update-game-event
   "Updates a game event, optimized if the game-clock does not change."
   ([gameId gameClockWithUuid gameEvent]
@@ -251,3 +251,12 @@
   [player]
   {})
 
+(defn set-game-summary
+  "FIXME: DO IT"
+  [gameId summary]
+  )
+
+(defn archive-game
+  "FIXME: delete from liveGameTable and update events attr in gameTable"
+  [gameId events]
+  )
