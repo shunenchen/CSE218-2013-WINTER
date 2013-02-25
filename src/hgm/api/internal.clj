@@ -57,3 +57,17 @@
        (let [events (db/get-game-events game)]
          (compute-player-stats (db/get-player player) events))
        (db/get-player-game-stats player game))))
+
+(defn merge-stats
+  [old new]
+  (if (vector? old)
+    (conj old new)
+    (+ old new)))
+
+(defn summarize-game
+  [[start & events]]
+  {:startTime (:startTime start)
+   :home (:teamId (:home start))
+   :away (:teamId (:away start))
+   :goals (filter #(= :goal (:type %)) events)
+   :penalties (filter #(= :penalty (:type %)) events)})

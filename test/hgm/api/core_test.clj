@@ -8,7 +8,10 @@
 (def y {:id "YYYY" :teamId "bar"})
 (def z {:id "ZZZZ" :teamId "baz"})
 (def events
-  [{:type :enter-ice  :playerId (:id x)                     :time 0}
+  [{:type :start :startTime 800
+    :home {:teamId "bar" :roster [(:id x) (:id y)] :starting [(:id x) (:id y)]}
+    :away {:teamId "baz" :roster [(:id z)] :starting [(:id z)]}}
+   {:type :enter-ice  :playerId (:id x)                     :time 0}
    {:type :enter-ice  :playerId (:id y)                     :time 40}
    {:type :goal       :playerId (:id x) :teamId (:teamId x) :time 50}
    {:type :enter-ice  :playerId (:id z)                     :time 65}

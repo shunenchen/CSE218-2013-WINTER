@@ -70,17 +70,30 @@
   - game summary"
   [gameId]
   (let [[start & events] (db/get-game-events gameId)
-        player-ids (concat (:roster (:home start)) (:roster (:away start)))
-;        player-stats (map #(compute-player-stats % events) player-ids)
-        ]
-
-    (comment (doseq player-ids
-               ))))
+        player-ids (concat (:roster (:home start)) (:roster (:away start)))]
+    (doseq [player-id player-ids]
+      (let [stats (compute-player-stats player-id events)]
+        (db/set-player-game-stats player-id gameId stats)
+        (db/set-player-career-stats player-id
+           (merge-with merge-stats
+                       (db/get-player-career-stats player-id)
+                       stats
+                       {:game-ids gameId})))
+      (db/set-game-summary gameId (summarize-game (cons start events))))
+    (db/archive-game gameId (cons start events))))
 
 (defapi get-events
   "Get a list of all game events for a particular game"
   [gameId]
   {:events (db/get-game-events gameId)})
+
+(defapi get-game-stats
+  "Get the stats for a specific game."
+  [gameId]
+  (if-let [summary (:summary (db/get-game gameId))]
+    (assoc summary :done true)
+    (let [summary (summarize-game gameId (db/get-game-events gameId))]
+      (assoc summary :done false))))
 
 (defapi get-player-career-stats
   "Get a list of all stats for this player

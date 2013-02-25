@@ -37,6 +37,7 @@
   (POST "/games"                    [startTime home away]
         (friend/authorize #{:official}
            (api/create-game startTime home away)))
+  (GET  "/games/:gameId/stats"      [gameId] (api/get-game-stats gameId))
   (GET  "/games/:gameId/events"     [gameId] (api/get-events gameId))
   (POST "/games/:gameId/archive"    [gameId]
         (friend/authorize #{:official}
