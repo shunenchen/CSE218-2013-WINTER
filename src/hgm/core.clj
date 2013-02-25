@@ -18,13 +18,9 @@
 
 
 (defroutes hgm-routes
-  (GET  "/" request
-        (io/file
-         (if (friend/authorized? #{:official} friend/*identity*)
-           "resources/controlPanel.html"
-           (if (friend/authorized? #{:official} friend/*identity*)
-             "resources/hockey.html"
-             "resources/fanInterface.html"))))
+  (GET  "/" [] (io/file "resources/fanInterface.html"))
+  (GET  "/admin" [] (friend/authorize #{:official} (io/file "resources/controlPanel.html")))
+  (GET  "/game" [] (friend/authorize #{:official} (io/file "resources/hockey.html")))
 
   ; roster
   (GET  "/teams/:team/get-forwards" [team] (api/get-forwards team))
