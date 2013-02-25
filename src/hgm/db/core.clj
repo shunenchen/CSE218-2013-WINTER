@@ -53,14 +53,8 @@
   [team]
     (get-roster-by-position team "goalie"))
 
-;; FIXME: ignore the implementation of the next two functions, but we need "real" versions of them
-(defn get-player-career-stats
-  [player]
-  [{:type :goal :player player :game-id "blah" :team "Los Angeles" :time 50}
-   {:type :goal :player player :game-id "blah2" :team "Los Angeles" :time 60}
-   {:type :on-ice :player player :game-id "blah" :time 100}])
-
-(defn add-player-game-stats
+(defn set-player-game-stats
+  "Sets the stats for the specified player-game."
   [playerId gameId stats]
     (def entry {:player playerId :game gameId :stats (str stats)})
     (with-client client
@@ -70,34 +64,61 @@
 (defn get-player-game-stats
   "Gets stats for the given player over all games or an individual game."
   ([playerId]
-    (get-player-game-stats playerId nil))
+    (map #(read-string (:stats %))
+      (filter #(not= "CAREER" (:game %)) ;See {set,get}-player-career-stats to understand corner case
+        (with-client client (query playerGameStatsTable playerId {})))))
   ([playerId gameId]
-    (into [] (map (fn [x] (read-string (:stats x)))
+    (map #(read-string (:stats %))
       (with-client client (query playerGameStatsTable playerId
-        (if (nil? gameId) {} {:range_condition [:EQ gameId]})))))))
+        {:range_condition [:EQ gameId]})))))
 
 (defn get-game-player-stats
   "Gets all the stats of a game for all players or an individual player."
   ([gameId]
-    (get-game-player-stats gameId nil))
+    (map #(read-string (:stats %))
+      (filter #(not= "CAREER" (:game %)) ;See {set,get}-player-career-stats to understand corner case
+        (with-client client (query gamePlayerStatsTable gameId {})))))
   ([gameId playerId]
-    (into [] (map (fn [x] (read-string (:stats x)))
+    (map #(read-string (:stats %))
       (with-client client (query gamePlayerStatsTable gameId
-        (if (nil? playerId) {} {:range_condition [:EQ playerId]})))))))
+        {:range_condition [:EQ playerId]})))))
 
-(defn add-team-game-stats
+(defn set-player-career-stats
+  "Sets a player's career stats."
+  [player stats]
+    (set-player-game-stats player "CAREER" stats))
+
+(defn get-player-career-stats
+  "Returns a player's career stats."
+  [player]
+    (get-player-game-stats player "CAREER"))
+
+(defn set-team-game-stats
+  "Sets a team's stats for a specified game."
   [team gameId stats]
     (with-client client (put-item teamGameStatsTable
       {:team team :game gameId :stats (str stats)})))
         
 (defn get-team-game-stats
-  "Get stats for all games the team has played in or for an individual game."
+  "Get stats for all games the team has played in or for an individual, specified game."
   ([team]
-    (get-team-game-stats team nil))
+    (map #(read-string (:stats %))
+      (filter #(not= "CUMULATIVE" (:game %)) ;See {set,get}-team-cumulative-stats to understand corner case
+        (with-client client (query teamGameStatsTable team {})))))
   ([team gameId]
-    (map (fn [x] (read-string (:stats x)))
-      (with-client client (query teamGameStatsTable team 
-        (if (nil? gameId) {} {:range_condition [:EQ gameId]}))))))
+    (map #(read-string (:stats %))
+      (with-client client (query teamGameStatsTable team
+        {:range_condition [:EQ gameId]})))))
+
+(defn set-team-cumulative-stats
+  "Sets a team's cumulative stats."
+  [team stats]
+    (set-team-game-stats team "CUMULATIVE" stats))
+
+(defn get-team-cumulative-stats
+  "Returns a team's cumulative stats over all games they've played."
+  [team]
+    (get-team-game-stats team "CUMULATIVE"))
 
 (defn game-id
   [year month day startTime awayTeam homeTeam]
@@ -168,7 +189,7 @@
 
   0: all events
   1: later than or equal time
-  2: between clock values - inclusive of the first clock)."
+  2: between clock values - inclusive of the first clock."
   ([gameId]
      (map #(update-in % [:event] read-string)
           (with-client client (query liveGameTable gameId {}))))
