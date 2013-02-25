@@ -260,3 +260,8 @@
   "FIXME: delete from liveGameTable and update events attr in gameTable"
   [gameId events]
   )
+
+(defn get-games
+  "FIXME: get a list of ALL games, without their event-list"
+  []
+  [{:id "XXX" :home "YYY" :away "ZZZ" :scheduled 500 :summary {:startTime 550}}])

@@ -18,22 +18,23 @@
 
 
 (defroutes hgm-routes
-  (GET  "/" [] (io/file "resources/fanInterface.html"))
+  (GET  "/"      [] (io/file "resources/fanInterface.html"))
   (GET  "/admin" [] (friend/authorize #{:official} (io/file "resources/controlPanel.html")))
-  (GET  "/game" [] (friend/authorize #{:official} (io/file "resources/hockey.html")))
+  (GET  "/game"  [] (friend/authorize #{:official} (io/file "resources/hockey.html")))
 
-  ; roster
+  ;; roster
   (GET  "/teams/:team/get-forwards" [team] (api/get-forwards team))
   (GET  "/teams/:team/get-defense"  [team] (api/get-defenders  team))
   (GET  "/teams/:team/get-goalies"  [team] (api/get-goalies  team))
   (GET  "/teams/:team/get-roster"   [team] (api/get-roster   team))
 
-  ; stats
+  ;; players
   (GET  "/players/:playerId/stats"  [playerId] (api/get-player-career-stats playerId))
   (GET  "/players/:playerId/stats/for-game/:gameId" [playerId gameId]
         (api/get-player-game-stats playerId gameId))
 
   ;; games
+  (GET  "/games"                    [] (api/get-games))
   (POST "/games"                    [startTime home away]
         (friend/authorize #{:official}
            (api/create-game startTime home away)))
@@ -43,8 +44,9 @@
         (friend/authorize #{:official}
            (api/archive-game gameId)))
 
-  ;; FIXME: /users should be admin-only, but we'll wait until we have a proper db
-  (GET  "/users"                    []     (api/get-users))
+  (GET  "/users"                    []
+        (friend/authorize #{:official}
+           (api/get-users)))
   (PUT  "/users/:user"              [user roles]
         (friend/authorize #{:official}
            (api/update-user user (into #{} (map keyword roles)))))
