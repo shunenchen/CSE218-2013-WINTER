@@ -10,51 +10,223 @@
 
 (def playerTable   "Player_Table")
 (def teamTable     "Team_Table")
-(def pastGameTable "Past_Game_Table")
-(def liveGameTable "Live_Game_Table")
+(def teamPlayerTable "Team_Player_Table")
+(def gameTable     "Game_Table")
+(def gameEventTable "Game_Event_Table")
 (def userTable     "User_Table")
 (def playerGameStatsTable "Player_Game_Stats_Table")
 (def gamePlayerStatsTable "Game_Player_Stats_Table")
-(def teamGameStatsTable "Team_Game_Stats_Table")
+
+;; TODO
+; check to make sure we have add/update/delete for players/users/teams/games/events
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Utilities
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn uuid [] (str (java.util.UUID/randomUUID)))
 
-(defn get-all-players [] (with-client client (scan playerTable {})))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Users
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn get-active-players
+(defn get-users
+  "Returns all user objects."
   []
-    (filter #(= "RECENT" (:date-time-uuid %)) (get-all-players)))
+    (map (fn [x] (read-string (:info x))) (with-client client (scan userTable {}))))
 
-;; FIXME: need a way to get a single player's data by uuid
+(defn get-user
+  "Returns the first user with the given google id, or nil if one doesn't exist."
+  [id]
+    (read-string (:info (with-client client (get-item userTable (create-key id))))))
+
+(defn create-user
+  "m is a map with an :identity key. Returns the user."
+  [m]
+    (let [u (assoc m :roles #{:official})]
+      (with-client client
+        (put-item userTable
+          {:id (:identity u)
+           :info (str u)}))
+      u))
+
+(defn update-user
+  "m is a map with an :identity key. Returns the user."
+  [id roles]
+    (let [u (assoc (get-user id) :roles roles)]
+      (with-client client (update-item userTable (create-key id) {:info (str u)}))
+      u))
+
+(defn delete-user
+  "Deletes the user with the given id"
+  [id]
+    (with-client client (delete-item userTable (create-key id))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Players
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn create-player
+  "Creates a player. player is a map which must include:
+   :teamId
+   :position
+   Returns the stored player object with an associated :id key."
+  [player]
+    (let [p (assoc player :id (uuid))]
+      (with-client client
+        (put-item playerTable
+          {:id (:id p)
+           :info (str p)})
+        (put-item teamPlayerTable
+          {:teamId (:teamId p)
+           :playerId (:id p)
+           :info (str p)}))
+      p))
+
+(defn update-player
+  "Updates a player."
+  [player]
+    (let [pid (:id player)
+         info (str player)
+         new-tid (:teamId player)
+         old-tid (:teamId (read-string (:info (with-client client
+           (get-item playerTable (create-key pid))))))]
+      (with-client client (update-item playerTable (create-key pid) {:info info}))
+      ;Handle the teamPlayerTable corner-case of switching teams
+      (if (not= new-tid old-tid)
+        (with-client client
+          (delete-item teamPlayerTable (create-key old-tid pid))
+          (put-item teamPlayerTable {:teamId new-tid :playerId pid :info info}))
+        (with-client client (update-item teamPlayerTable
+          (create-key (:teamId new-tid) (:playerId pid)) {:info info})))))
+
+;(defn delete-player
+;  "Deletes a player from the data base."
+;  [id]
+;    (let [player (with-client client (get-item playerTable (create-key id)))]
+;      (with-client client
+;        (delete-item teamPlayerTable (create-key (:teamId player) id))
+;        (delete-item playerTable (create-key id)))))
+
+(defn get-players
+  "Returns all player objects."
+  []
+    (map #(read-string (:info %)) (with-client client (scan playerTable {:attributes_to_get ["info"]}))))
+
 (defn get-player
   "Returns the player object which should have a :id (uuid) and :teamId (team uuid)."
-  [player]
-  {})
+  [id]
+    (read-string (:info (with-client client (get-item playerTable (create-key id))))))
 
 (defn get-roster
+  "Returns the player objects associated with the given team."
+  [id]
+    (map #(read-string (:info %)) (with-client client (query teamPlayerTable id {}))))
+    
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Teams
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; TODO {delete,set}-team
+
+(defn create-team
+  "Team should be a map of team info. Returns the team object with an associated :id."
   [team]
-    (filter #(= team (:team %)) (get-active-players)))
+    (let [tid (uuid)
+         t (assoc team :id tid)]
+      (with-client client (put-item teamTable {:id tid :data "INFO" :info (str t)}))
+      (with-client client (put-item teamTable {:id tid :data "GAMES" :games (str [])}))
+      t))
 
-(defn get-roster-by-position
-  [team position]
-    (filter #(= position (:position %)) (get-roster team)))
+(defn get-teams
+  "Returns all team info objects."
+  []
+    (map #(read-string (:info %)) (filter #(= (:data %) "INFO")
+      (with-client client (scan teamTable {:attributes_to_get ["data" "info"]})))))
+      
+(defn get-team-info
+  "Returns info via a team object."
+  [id]
+    (read-string (:info (with-client client (get-item teamTable (create-key id "INFO"))))))
 
-(defn get-forwards
-  [team]
-    (get-roster-by-position team "forward"))
+(defn update-team-info
+  "Updates the given team's info."
+  [id info]
+    (with-client client (update-item teamTable (create-key id "INFO") {:info (str info)})))
 
-(defn get-defenders
-  [team]
-    (get-roster-by-position team "defender"))
+(defn get-team-games
+  "Returns a collection of game ids for games the team has participated in."
+  [id]
+    (read-string (:games (with-client client (get-item teamTable (create-key id "GAMES"))))))
 
-(defn get-goalies
-  [team]
-    (get-roster-by-position team "goalie"))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Games
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defn convert-realTime
+  [dateTime]
+  (format "%013d" dateTime))
+
+(defn game-id
+  [startTime awayTeam homeTeam]
+    (str (convert-realTime startTime) \- awayTeam \@ homeTeam))
+
+(defn create-game
+  "Input should be a map which includes the following keys:
+   :startTime (timestamp)
+   :homeTeam (team id)
+   :awayTeam (team id)"
+  [game]
+    (let [hid (:homeTeam game)
+         aid (:awayTeam game)
+         gid (game-id (:startTime game) aid hid)
+          g (assoc game :id gid)]
+      (with-client client (put-item gameTable {:id gid :info (str g)}))
+      (let [aGames (read-string (:games (with-client client (get-item teamTable (create-key aid "GAMES")))))
+           hGames (read-string (:games (with-client client (get-item teamTable (create-key hid "GAMES")))))]
+        (with-client client
+          (update-item teamTable (create-key aid "GAMES") {:games (str (conj aGames g))})
+          (update-item teamTable (create-key hid "GAMES") {:games (str (conj hGames g))})     
+     g))))
+
+(defn get-game
+  "Returns game object for the given id, or nil."
+   [id]
+    (try
+      (read-string (:info (with-client client (get-item gameTable (create-key id)))))
+      (catch Exception e nil)))
+
+(defn get-game-ids
+  "Returns ids for all created games."
+   []
+    (map :id (with-client client (scan gameTable {:attributes_to_get ["id"]}))))
+    
+(defn get-games
+  "Returns all game objects."
+  []
+    (map #(read-string (:info %)) (with-client client (scan gameTable {:attributes_to_get ["info"]}))))
+
+(defn update-game
+  "Game should be a map with an :id key."
+  [game]
+    (with-client client (update-item gameTable (create-key (:id game)) {:info (str game)})))
+
+(defn set-game-summary
+  "Sets the summary of an existing game. Returns the updated game object."
+  [id summary]
+    (let [game (assoc (get-game id) :summary summary)]
+      (update-game game)
+      game))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Stats
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    
 (defn set-player-game-stats
   "Sets the stats for the specified player-game."
   [playerId gameId stats]
-    (def entry {:player playerId :game gameId :stats (str stats)})
+    (def entry {:playerId playerId :gameId gameId :stats (str stats)})
     (with-client client
       (put-item playerGameStatsTable entry)
       (put-item gamePlayerStatsTable entry)))
@@ -63,7 +235,7 @@
   "Gets stats for the given player over all games or an individual game."
   ([playerId]
     (map #(read-string (:stats %))
-      (filter #(not= "CAREER" (:game %)) ;See {set,get}-player-career-stats to understand corner case
+      (filter #(not= "CAREER" (:gameId %)) ;See {set,get}-player-career-stats to understand corner case
         (with-client client (query playerGameStatsTable playerId {})))))
   ([playerId gameId]
     (map #(read-string (:stats %))
@@ -74,7 +246,7 @@
   "Gets all the stats of a game for all players or an individual player."
   ([gameId]
     (map #(read-string (:stats %))
-      (filter #(not= "CAREER" (:game %)) ;See {set,get}-player-career-stats to understand corner case
+      (filter #(not= "CAREER" (:gameId %)) ;See {set,get}-player-career-stats to understand corner case
         (with-client client (query gamePlayerStatsTable gameId {})))))
   ([gameId playerId]
     (map #(read-string (:stats %))
@@ -83,198 +255,84 @@
 
 (defn set-player-career-stats
   "Sets a player's career stats."
-  [player stats]
-    (set-player-game-stats player "CAREER" stats))
+  [id stats]
+    (set-player-game-stats id "CAREER" stats))
 
 (defn get-player-career-stats
   "Returns a player's career stats."
-  [player]
-    (get-player-game-stats player "CAREER"))
-
-(defn set-team-game-stats
-  "Sets a team's stats for a specified game."
-  [team gameId stats]
-    (with-client client (put-item teamGameStatsTable
-      {:team team :game gameId :stats (str stats)})))
-
-(defn get-team-game-stats
-  "Get stats for all games the team has played in or for an individual, specified game."
-  ([team]
-    (map #(read-string (:stats %))
-      (filter #(not= "CUMULATIVE" (:game %)) ;See {set,get}-team-cumulative-stats to understand corner case
-        (with-client client (query teamGameStatsTable team {})))))
-  ([team gameId]
-    (map #(read-string (:stats %))
-      (with-client client (query teamGameStatsTable team
-        {:range_condition [:EQ gameId]})))))
+  [id]
+    (get-player-game-stats id "CAREER"))
 
 (defn set-team-cumulative-stats
   "Sets a team's cumulative stats."
-  [team stats]
-    (set-team-game-stats team "CUMULATIVE" stats))
+  [id stats]
+    (with-client client (put-item teamTable (create-key id "CUMULATIVE_STATS") {:stats (str stats)})))
 
 (defn get-team-cumulative-stats
   "Returns a team's cumulative stats over all games they've played."
-  [team]
-    (get-team-game-stats team "CUMULATIVE"))
+  [id]
+    (read-string (:stats (with-client client(get-item teamTable (create-key id "CUMULATIVE_STATS"))))))
 
-(defn game-id
-  [year month day startTime awayTeam homeTeam]
-  (str year \- (format "%02d" month) \- (format "%02d" day) \- startTime \-
-       awayTeam \@ homeTeam))
-
-(defn get-unarchived-game-ids
-  []
-    (map :game_ID (into #{} (with-client client
-      (scan liveGameTable {:attributes_to_get ["game_ID"]})))))
-
-(defn unarchived-game-exists?
-  [gameId]
-    (< 0 (count (with-client client (query liveGameTable gameId {:limit 1})))))
-
-(defn game-started?
-  [gameId]
-    (< 0 (count (filter #(= "{:type :start}" %)
-      (map :event (with-client client (query liveGameTable gameId {})))))))
-
-(defn game-ended?
-  [gameId]
-    (< 0 (count (filter #(= "{:type :end}" %)
-      (map :event (with-client client (query liveGameTable gameId {})))))))
-
-(defn convert-realTime
-  [dateTime]
-  (format "%013d" dateTime))
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Game Events
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    
 (defn convert-gameClock
   [gameClock]
   (format "%07d" gameClock))
 
 (defn add-game-event
-  [gameId gameClock gameEvent]
-  (with-client client
-      (put-item liveGameTable
-        { :game_ID gameId
-          :game_clock_uuid (str (convert-gameClock gameClock) \- (uuid))
-          :event (str gameEvent)})))
+  "Adds a new game event to the specified game at the specified clock time.
+   clock should be an integer representing the game clock.
+   event should be a map that has a :type key.
+   Returns a string representing the gameclock with a uuid unique to the event."
+  [gameId clock event]
+    (let [clockUuid (str (convert-gameClock clock) \- (uuid))]
+      (with-client client (put-item gameEventTable
+        { :gameId gameId
+          :clockUuid clockUuid
+          :event (str event)}))
+       clockUuid))
 
 (defn remove-game-event
-  [gameId gameClockWithUuid]
-   (with-client client (delete-item liveGameTable
-     {:hash_key gameId :range_key gameClockWithUuid})))
+  "Removes the game event specified by the game and clockUuid."
+  [gameId clockUuid]
+   (with-client client (delete-item gameEventTable (create-key gameId clockUuid))))
 
 (defn update-game-event
-  "Updates a game event, optimized if the game-clock does not change."
-  ([gameId gameClockWithUuid gameEvent]
-    (with-client client (update-item liveGameTable {:hash_key gameId :range_key gameClockWithUuid} {:event (str gameEvent)} {})))
-  ([gameId oldGameClockWithUuid gameEvent newGameClock]
-    (remove-game-event gameId oldGameClockWithUuid)
-    (add-game-event gameId newGameClock gameEvent)))
-
-;(defn test-game-events
-;  []
-;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 0 {:type :start})
-;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 60000 {:type :shot :player "John Mangan"})
-;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 75000 {:type :penalty :player "David Srour"})
-;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 200000 {:type :shot :player "Samuel Chen"})
-;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 220000 {:type :shot :player "John Mangan"})
-;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 260000 {:type :penalty :player "Ben Ellis"})
-;  (add-game-event (game-id 2012 2 7 "19:30" "SD" "LA") 3600000 {:type :end}))
+  "Updates a game event, optimimal if the game-clock does not change."
+  ([gameId clockUuid event]
+    (with-client client (update-item gameEventTable (create-key gameId clockUuid) {:event (str event)})))
+  ([gameId oldClockUuid event newClock]
+    (remove-game-event gameId oldClockUuid)
+    (add-game-event gameId newClock event)))
 
 (defn get-game-events
   "Returns game events for the given game, which can take 0-2 game
-  clock parameters as milliseconds since the game started
+  clock parameters as time since the game started
 
   0: all events
   1: later than or equal time
   2: between clock values - inclusive of the first clock."
-  ([gameId]
+  ([id]
      (map #(update-in % [:event] read-string)
-          (with-client client (query liveGameTable gameId {}))))
-  ([gameId gameClock]
+          (with-client client (query gameEventTable id))))
+  ([id clock]
     ; Will return inclusive such as a >= due to UUIDs
      (map #(update-in % [:event] read-string)
-          (with-client client (query liveGameTable gameId {:range_condition
-            [:GT (convert-gameClock gameClock)]}))))
-  ([gameId gameClockStart gameClockEnd]
+          (with-client client (query gameEventTable id
+            {:range_condition [:GT (convert-gameClock clock)]}))))
+  ([id clockStart clockEnd]
     ; Will return inclusive of the start, exclusive of the end time
      (map #(update-in % [:event] read-string)
-          (with-client client (query liveGameTable gameId {:range_condition
-            [:BETWEEN (convert-gameClock gameClockStart)
-             (convert-gameClock gameClockEnd)]})))))
+          (with-client client (query gameEventTable id {:range_condition
+            [:BETWEEN (convert-gameClock clockStart) (convert-gameClock clockEnd)]})))))
 
-(defn get-users
-  "Returns a lazy sequence of users."
-  []
-    (map (fn [x] (read-string (:cmap x))) (with-client client (scan userTable {}))))
-
-(defn get-user
-  "Returns the first user with the given google id, or nil if one doesn't exist."
+(defn game-started?
   [id]
-    (let [user (with-client client (get-item userTable {:hash_key id}))]
-      (if (nil? user) nil (read-string (:cmap user)))))
+    (< 0 (filter #(= (:type %) :start) (get-game-events id))))
 
-(defn create-user
-  "m is a map with an :identity key. Returns the user."
-  [m]
-    (let [u (assoc m :roles #{:official})]
-      (with-client client
-        (put-item userTable
-          {:identity (:identity u)
-           :cmap (str u)}))
-      u))
-
-(defn update-user
-  "m is a map with an :identity key. Returns the user."
-  [userId roles]
-    (let [u (assoc (get-user userId) :roles roles)]
-      (with-client client
-        (update-item userTable {:hash_key userId} {:cmap (str u)}))
-      u))
-
-(defn delete-user
-  "Deletes the user with the given id"
+(defn game-ended?
   [id]
-    (with-client client (delete-item userTable {:hash_key id}))
-    nil)
+    (< 0 (filter #(= (:type %) :end) (get-game-events id))))
 
-(defn create-game
-  "Input should be a map which includes the following keys:
-   :startTime (timestamp)
-   :homeTeam (team id)
-   :awayTeam (team id)"
-  [game]
-  ;TODO store game in a gametable
-  ;TODO fix game-id to make sense
-  ;(game-id year month day startTime awayTeam homeTeam)
-  "a-game-id")
-
-(defn get-game
-  [gameId]
-    ;do two queries (if necessary) to the game table, archived vs. unarchived
- )
-   
-(defn set-game-summary
-  "FIXME: DO IT"
-  [gameId summary]
-    (let [game (get-game gameId)]
-       ;assoc the summary into game and store it
-       )      
-  )
-
-;; TODO
-; check to make sure we have add/update/delete for players/users/teams/games/events
-  
-(defn archive-game
-  "FIXME: delete from liveGameTable and update events attr in gameTable"
-  [gameId events]
-    ;get game out of game table (unarchived)
-    ;assoc events into game
-    ;store game in game table (archived)
-    ;delete game events from the liveGameTable 
-   )
-
-(defn get-games
-  "FIXME: get a list of ALL games, without their event-list"
-  []
-  [{:id "XXX" :home "YYY" :away "ZZZ" :scheduled 500 :summary {:startTime 550}}])

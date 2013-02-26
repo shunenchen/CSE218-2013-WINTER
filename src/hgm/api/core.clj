@@ -24,17 +24,17 @@
 (defapi get-forwards
   "Get a list of all forwards in `team'."
   [team]
-  (db/get-forwards team))
+  (filter #(= (:position %) :forward) (db/get-roster team)))
 
 (defapi get-defenders
   "Get a list of all defense in `team'."
   [team]
-  (db/get-defenders team))
+  (filter #(= (:position %) :defender) (db/get-roster team)))
 
 (defapi get-goalies
   "Get a list of all goalies in `team'."
   [team]
-  (db/get-goalies team))
+  (filter #(= (:position %) :goalie) (db/get-roster team)))
 
 (defapi get-roster
   "Get the roster of `team'."
