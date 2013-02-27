@@ -12,75 +12,65 @@
             ])
 )
 
-;(try
-;  (with-client client
-;   (delete-table	playerTable)
-;   (delete-table	teamTable)
-;   (delete-table	pastGameTable)
-;   (delete-table	liveGameTable)
-;  ) (catch Exception e ())
-;)
-
-
-
-;Live_Game_Table
-;ACTIVE
-;game_ID
-;game_clock_uuid
-;10
-;5
-
 ;(with-client client
-;	 (create-table liveGameTable
-;	{:read_units 10 :write_units 5}
-;	{:name "game_ID" :type :string}
-;	{:name "game_clock_uuid" :type :string})
-;)
-
-;(with-client client
-;	 (create-table pastGameTable
-;	{:read_units 10 :write_units 5}
-;	{:name "game_ID" :type :string}	)
-;)
-
-;(with-client client
-;	 (create-table playerTable
-;	{:read_units 10 :write_units 5}
-;	{:name "uuid" :type :string}
-;	{:name "date-time-uuid
-;" :type :string})
-;)
-
-;(with-client client
-;	 (create-table teamTable
-;	{:read_units 10 :write_units 5}
-;	{:name "name" :type :string}
-;	{:name "date-time-uuid" :type :string})
-;)
+;	 (delete-table	playerTable)
+;	 (delete-table	teamPlayerTable)
+;	 (delete-table	gameTable)
+;	 (delete-table	liveGameTable)
+;	 (delete-table	userTable)
+;	 (delete-table	playerGameStatsTable)
+;	 (delete-table	gamePlayerStatsTable)
+;	 (delete-table	teamGameStatsTable))
 
 
-;(with-client client
-;	 (create-table userTable
-;	{:read_units 10 :write_units 5}
-;	{:name "identity" :type :string})
-;)
+(with-client client
+	(create-table liveGameTable
+	{:read_units 10 :write_units 5}
+	{:name "id" :type :string}
+	{:name "clockUuid" :type :string}))
 
-;(with-client client
-;	 (create-table playerGameStatsTable
-;	{:read_units 10 :write_units 5}
-;	{:name "player" :type :string}
-;	{:name "game" :type :string})
-;)
+(with-client client
+	 (create-table gameTable
+	{:read_units 10 :write_units 5}
+	{:name "status" :type :string}
+	{:name "id" :type :string}))
 
-;(with-client client
-;	(create-table gamePlayerStatsTable
-;	{:read_units 10 :write_units 5}
-;	{:name "game" :type :string}
-;	{:name "player" :type :string})
-;)
-;(with-client client
-;	(create-table teamGameStatsTable
-;	{:read_units 10 :write_units 5}
-;	{:name "team" :type :string}
-;	{:name "game" :type :string})
-;)
+(with-client client
+	(create-table playerTable
+	{:read_units 10 :write_units 5}
+	{:name "id" :type :string})))
+	
+(with-client client
+	(create-table teamPlayerTable
+	{:read_units 10 :write_units 5}
+	{:name "teamId" :type :string}
+	{:name "playerId" :type :string}))
+	
+(with-client client
+	 (create-table teamTable
+	{:read_units 10 :write_units 5}
+	{:name "id" :type :string}
+	{:name "data" :type :string}))
+
+(with-client client
+	 (create-table userTable
+	{:read_units 10 :write_units 5}
+	{:name "id" :type :string}))
+
+(with-client client
+	 (create-table playerGameStatsTable
+	{:read_units 10 :write_units 5}
+	{:name "playerId" :type :string}
+	{:name "gameId" :type :string}))
+
+(with-client client
+	(create-table gamePlayerStatsTable
+	{:read_units 10 :write_units 5}
+	{:name "gameId" :type :string}
+	{:name "playerId" :type :string}))
+	
+(with-client client
+	(create-table teamGameStatsTable
+	{:read_units 10 :write_units 5}
+	{:name "teamId" :type :string}
+	{:name "gameId" :type :string}))
