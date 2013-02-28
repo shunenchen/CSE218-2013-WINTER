@@ -186,8 +186,8 @@
       (let [aGames (read-string (:games (with-client client (get-item teamTable (create-key aid "GAMES")))))
            hGames (read-string (:games (with-client client (get-item teamTable (create-key hid "GAMES")))))]
         (with-client client
-          (update-item teamTable (create-key aid "GAMES") {:games (str (conj aGames g))})
-          (update-item teamTable (create-key hid "GAMES") {:games (str (conj hGames g))})     
+          (update-item teamTable (create-key aid "GAMES") {:games (str (conj aGames gid))})
+          (update-item teamTable (create-key hid "GAMES") {:games (str (conj hGames gid))})     
      g))))
 
 (defn get-game
@@ -327,12 +327,3 @@
      (map #(update-in % [:event] read-string)
           (with-client client (query gameEventTable id {:range_condition
             [:BETWEEN (convert-gameClock clockStart) (convert-gameClock clockEnd)]})))))
-
-(defn game-started?
-  [id]
-    (< 0 (filter #(= (:type %) :start) (get-game-events id))))
-
-(defn game-ended?
-  [id]
-    (< 0 (filter #(= (:type %) :end) (get-game-events id))))
-
