@@ -4,7 +4,16 @@
   (:use clojure.test)
   (:use hgm.db.core :reload)
   (:use hgm.db.clj_dynamo :reload))
-  
+
+(def playerIdMap {:BRAYDONCOBURN (uuid) :NICKLASGROSSMANN (uuid) :MIKEKNUBLE (uuid) :BRAYDENSCHENN (uuid) :HARRYZOLNIERCZYK (uuid) :SEANCOUTURIER (uuid) :WAYNESIMMONDS (uuid) :LUKESCHENN (uuid) :MATTREAD (uuid) :MAXIMETALBOT (uuid) :RUSLANFEDOTENKO (uuid) :BRUNOGERVAIS (uuid) :CLAUDEGIROUX (uuid) :ERIKGUSTAFSSON (uuid) :ZACRINALDO (uuid) :KIMMOTIMONEN (uuid) :DANNYBRIERE (uuid) :JAKUBVORACEK (uuid) :ILYABRYZGALOV (uuid) :BRIANBOUCHER (uuid) :MATTNISKANEN (uuid) :DERYKENGELLAND (uuid) :PAULMARTIN (uuid) :PASCALDUPUIS (uuid) :TANNERGLASS (uuid) :CHRISKUNITZ (uuid) :BRANDONSUTTER (uuid) :JAMESNEAL (uuid) :BEAUBENNETT (uuid) :MATTCOOKE (uuid) :CRAIGADAMS (uuid) :ROBERTBORTUZZO (uuid) :BROOKSORPIK (uuid) :JOEVITALE (uuid) :TYLERKENNEDY (uuid) :KRISLETANG (uuid) :EVGENIMALKIN (uuid) :SIDNEYCROSBY (uuid) :MARC-ANDREFLEURY (uuid) :TOMASVOKOUN (uuid) })
+(def teamIdMap   {:NHL_PIT (uuid) :NHL_PHI (uuid)})
+
+(defn create-team-uuid
+  "Team should be a map of team info. Returns the team object with an associated :id."
+  [team tid]
+  (with-client client (put-item teamTable {:id tid :data "INFO" :info (str t)}))
+  (with-client client (put-item teamTable {:id tid :data "GAMES" :games (str [])})))
+	  
 (defn delete-all-players []
    (with-client client 
    (doseq [item (scan playerTable {})]
@@ -12,25 +21,8 @@
    (is (empty? (scan playerTable {}))))
 )
 
-(def playerIdMap {:BRAYDONCOBURN (uuid) :NICKLASGROSSMANN (uuid) :MIKEKNUBLE (uuid) :BRAYDENSCHENN (uuid) :HARRYZOLNIERCZYK (uuid) :SEANCOUTURIER (uuid) :WAYNESIMMONDS (uuid) :LUKESCHENN (uuid) :MATTREAD (uuid) :MAXIMETALBOT (uuid) :RUSLANFEDOTENKO (uuid) :BRUNOGERVAIS (uuid) :CLAUDEGIROUX (uuid) :ERIKGUSTAFSSON (uuid) :ZACRINALDO (uuid) :KIMMOTIMONEN (uuid) :DANNYBRIERE (uuid) :JAKUBVORACEK (uuid) :ILYABRYZGALOV (uuid) :BRIANBOUCHER (uuid) :MATTNISKANEN (uuid) :DERYKENGELLAND (uuid) :PAULMARTIN (uuid) :PASCALDUPUIS (uuid) :TANNERGLASS (uuid) :CHRISKUNITZ (uuid) :BRANDONSUTTER (uuid) :JAMESNEAL (uuid) :BEAUBENNETT (uuid) :MATTCOOKE (uuid) :CRAIGADAMS (uuid) :ROBERTBORTUZZO (uuid) :BROOKSORPIK (uuid) :JOEVITALE (uuid) :TYLERKENNEDY (uuid) :KRISLETANG (uuid) :EVGENIMALKIN (uuid) :SIDNEYCROSBY (uuid) :MARC-ANDREFLEURY (uuid) :TOMASVOKOUN (uuid) })
-(def teamIdMap   {:NHL_PIT (uuid) :NHL_PHI (uuid)})
 
-(defn create-player-uuid
-  "Creates a player. player is a map which must include:
-   :teamId
-   :position
-   Returns the stored player object with an associated :id key."
-  [player puuid]
-    (let [p (assoc player :id puuid)]
-      (with-client client
-        (put-item playerTable
-          {:id (:id p)
-           :info (str p)})
-        (put-item teamPlayerTable
-          {:teamId (:teamId p)
-           :playerId (:id p)
-           :info (str p)}))
-      p))
+
 	  
                                                                                                                                                  
 (defn add-all-players                                                                                                                            
