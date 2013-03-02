@@ -144,11 +144,11 @@
 
 (defn get-players-name
   "Returns all player objects with the partial name."
-  [pn]
-    (map #(read-string (:info %))
-	(filter #(substring? (upper-case pn) (:info %)) 
-	(with-client client (scan playerTable {:attributes_to_get ["info"]})))))
-	
+  [pn]	
+	(filter #(substring? (upper-case pn) (:name %))
+	(map #(read-string (:info %))
+	(filter #(not= (:info %) " ")	
+	(with-client client (scan playerTable {:attributes_to_get ["info"]}))))))
 	
 (defn get-roster
   "Returns the player objects associated with the given team."
@@ -194,8 +194,8 @@
 (defn get-team-name
   "Returns all team info objects with the partial name."
   [pn]
-   (map #(read-string (:info %))
-	(filter #(substring? (capitalize pn) (:info %))
+   (filter #(substring? (capitalize pn) (:name %))
+	(map #(read-string (:info %))
 	(filter #(not= (:info %) nil)	
 	(with-client client (scan teamTable {:attributes_to_get ["info"]}))))))
 	
