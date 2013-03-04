@@ -139,6 +139,8 @@
                                      :time startTime
                                      :home (:roster home)
                                      :away (:roster away)})
+        (db/update-game gameId 
+          (assoc-in (db/get-game gameId) [:status] "started"))
         (doseq [p (concat (:starting home) (:starting away))]
           (db/add-game-event gameId 0 {:type :enter-ice :playerId p})))))
 
@@ -153,7 +155,9 @@
 (defapi add-end-game-event
   "End a game."
   [gameId time]
-  (db/add-game-event gameId time {:type :end}))
+  (do (db/add-game-event gameId time {:type :end})
+      (db/update-game gameId 
+        (assoc-in (db/get-game gameId) [:status] "ended"))))
 
 (defapi add-shot-event
   "Add a shot event."
