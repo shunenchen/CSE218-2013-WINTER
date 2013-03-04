@@ -55,12 +55,25 @@
   (db/update-user user roles))
 
 
+;;;;;; games, teams
+
+(defapi get-game
+  "Gets the specified game"
+  [gameId]
+  (db/get-game gameId))
+
+(defapi get-team
+  "Gets the specified team"
+  [team]
+  (db/get-team-info team))
+
 ;;;; Events / Stats
 
 (defapi create-game
   "Create a game between `home' and `away', starting at `startTime'."
   [startTime home away]
-  (db/create-game startTime home away))
+  (db/create-game {:startTime startTime :homeTeam home 
+      :awayTeam away :status "scheduled"}))
 
 (defapi get-games
   "Get a list of all games, ignoring the game events."
@@ -85,7 +98,8 @@
                        stats
                        {:game-ids gameId})))
       (db/set-game-summary gameId (summarize-game (cons start events))))
-    (db/archive-game gameId (cons start events))))
+    (db/update-game gameId 
+     (assoc-in (db/get-game gameId) [:status] "finalized"))))
 
 (defapi get-events
   "Get a list of all game events for a particular game"
@@ -118,7 +132,8 @@
 (defapi add-start-game-event
   "Start a game."
   [gameId startTime home away]
-  (if (or (not (db/unarchived-game-exists? gameId)) (db/game-started? gameId))
+  (if (let [game (db/get-game gameId)] 
+       (or (nil? game) (not= "scheduled" (:status game))))
     (throw (Exception. "GAME ALREADY STARTED / NON-EXISTANT"))
     (do (db/add-game-event gameId 0 {:type :start
                                      :time startTime
