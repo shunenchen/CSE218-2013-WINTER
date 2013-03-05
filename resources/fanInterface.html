@@ -43,13 +43,25 @@ window.onload=function() {
 		target = document.getElementById('selectGame');
    				
 		for (var i = 0; i < data["data"].length; i++) { 
-			var dom_txt = data["data"][i]["away"] + " @ " + data["data"][i]["home"] + " (" + EpochToDate(data["data"][i]["scheduled"]) + ")";
+			var dom_txt = getTeamName(data["data"][i]["awayTeam"]) + " @ " + getTeamName(data["data"][i]["homeTeam"]) + " (" + EpochToDate(data["data"][i]["startTime"]) + ")";
 			games_ids[dom_txt] = data["data"][i]["id"];
 			target.options[target.options.length]=new Option(dom_txt);
 		}      
     });	
 	$('.player_events_div').hide();
 };
+
+function getTeamName(teamId) {
+	var teamName = "undefined";
+	$.ajax({
+		type: 'GET',
+		url: "/teams/"+teamId,
+		dataType: 'json',
+		success: function(data) {teamName = data["name"];},
+		async: false
+	});	
+	return teamName;
+}
 
 function setupPage(dataToShow) {
 	if (dataToShow === DataToShow.SHOW_GAME_EVENTS && currently_showing !== DataToShow.SHOW_GAME_EVENTS)
