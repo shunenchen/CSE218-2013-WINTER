@@ -65,6 +65,10 @@ $(document).ready(function() {
 								target.value += data["events"][i]["event"]["info"] + "\t";	
 							else if ("HIT" === data["events"][i]["event"]["type"])
 								target.value += data["events"][i]["event"]["info"] + "\t";
+							else if ("ASSIST" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["info"] + "\t";
+							else if ("GOAL" === data["events"][i]["event"]["type"])
+								target.value += "GOAL! - " + data["events"][i]["event"]["info"] + "\t";
 							else if ("SAVE" === data["events"][i]["event"]["type"])
 								target.value += data["events"][i]["event"]["playerName"] + " Gets a Save\t";		
 							else if ("Game Start" === data["events"][i]["event"]["type"])
