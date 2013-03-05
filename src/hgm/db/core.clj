@@ -215,7 +215,8 @@
   "Input should be a map which includes the following keys:
    :startTime (timestamp)
    :homeTeam (team id)
-   :awayTeam (team id)"
+   :awayTeam (team id)
+   :status scheduled/started/ended/finalized"
   [game]
     (let [hid (:homeTeam game)
          aid (:awayTeam game)
@@ -355,7 +356,7 @@
   2: between clock values - inclusive of the first clock."
   ([id]
      (map #(update-in % [:event] read-string)
-          (with-client client (query gameEventTable id))))
+          (with-client client (query gameEventTable id {}))))
   ([id clock]
     ; Will return inclusive such as a >= due to UUIDs
      (map #(update-in % [:event] read-string)

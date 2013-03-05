@@ -22,6 +22,9 @@
   (GET  "/admin" [] (friend/authorize #{:official} (io/file "resources/controlPanel.html")))
   (GET  "/game"  [] (friend/authorize #{:official} (io/file "resources/hockey.html")))
 
+  ;; team
+  (GET  "/teams/:team"            [team] (api/get-team team))
+
   ;; roster
   (GET  "/teams/:team/get-forwards" [team] (api/get-forwards team))
   (GET  "/teams/:team/get-defense"  [team] (api/get-defenders  team))
@@ -38,6 +41,7 @@
   (POST "/games"                    [startTime home away]
         (friend/authorize #{:official}
            (api/create-game startTime home away)))
+  (GET  "/games/:gameId"            [gameId] (api/get-game gameId))
   (GET  "/games/:gameId/stats"      [gameId] (api/get-game-stats gameId))
   (GET  "/games/:gameId/events"     [gameId] (api/get-events gameId))
   (POST "/games/:gameId/archive"    [gameId]

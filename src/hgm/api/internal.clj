@@ -53,7 +53,7 @@
   ([player]
      (db/get-player-career-stats player))
   ([player game]
-     (if (db/unarchived-game-exists? game)
+     (if (not= "finalized" (:status (db/get-game game)))
        (let [events (db/get-game-events game)]
          (compute-player-stats (db/get-player player) events))
        (db/get-player-game-stats player game))))
