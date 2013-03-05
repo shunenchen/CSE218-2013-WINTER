@@ -5,7 +5,6 @@
   (:use hgm.db.core :reload)
   (:use hgm.db.clj_dynamo :reload))
 
-
 (defn get-uuid-map 
 	[]
 	(with-client client (get-item playerTable (create-key "0"))))
@@ -14,7 +13,6 @@
 (def tu-map (read-string ( (get-uuid-map) :teamHashList)))
 
 (def game-id-test (game-id 1361388600 (tu-map :NHL_PIT) (tu-map :NHL_PHI)))
---
 
 (defn add-phi-pit-game-events
 []
