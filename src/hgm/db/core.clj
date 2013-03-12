@@ -70,7 +70,6 @@
 (defn create-player
   "Creates a player. player is a map which must include:
    :teamId
-   :position
    Returns the stored player object with an associated :id key."
   [player]
     (let [p (assoc player :id (uuid))]
