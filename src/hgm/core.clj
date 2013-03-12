@@ -25,6 +25,12 @@
   ;; team
   (GET  "/teams/:team"            [team] (api/get-team team))
 
+
+  ;; searches
+  (GET  "/search/teams/:name"     [name] (api/search-teams name))
+  (GET  "/search/players/:name"     [name] (api/search-players name))
+  
+
   ;; roster
   (GET  "/teams/:team/get-forwards" [team] (api/get-forwards team))
   (GET  "/teams/:team/get-defense"  [team] (api/get-defenders  team))

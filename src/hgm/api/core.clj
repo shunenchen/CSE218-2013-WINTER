@@ -42,6 +42,18 @@
   (db/get-roster team))
 
 
+;;;;; Searches
+  
+(defapi search-teams
+  "Get all teams that contain the substring `name'."
+  [name]
+  (db/search-teams name))
+
+(defapi search-players
+  "Get all players that contain the substring `name'."
+  [name]
+  (db/search-players name))
+
 ;;;; Users
 
 (defapi get-users
