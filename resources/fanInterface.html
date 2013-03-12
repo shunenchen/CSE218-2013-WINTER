@@ -36,7 +36,7 @@ $(document).ready(function() {
 					{
 						target.value = "";
 						for (var i = 0; i < data["events"].length; i++) { 
-							if (data["events"][i]["event"]["game_clock"]) {
+							if (data["events"][i]["event"]["game_clock"] != undefined) {
 								var time = MillisecToMinSec(data["events"][i]["event"]["game_clock"]);
 								var str =  time["mins"] + ":" + time["secs"];
 								while(str.length < 7) str+=" ";
