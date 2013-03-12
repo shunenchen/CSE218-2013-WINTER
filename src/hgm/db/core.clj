@@ -1,5 +1,5 @@
 (ns hgm.db.core
-  (:require [clojure.string :as str])
+  (:require clojure.string)
   (:use clojure.tools.logging)
   (:use clojure.test)
   (:use hgm.db.clj_dynamo :reload))
@@ -32,24 +32,6 @@
   [substring ^String s]
   (.contains s substring))
   
-(defn ^String upper-case
-  "Converts string to all upper-case."
-  {:added "1.2"}
-  [^CharSequence s]
-  (.. s toString toUpperCase))
-  
-(defn ^String capitalize
-  "Converts first character of the string to upper-case, all other
-  characters to lower-case."
-  {:added "1.2"}
-  [^CharSequence s]
-  (let [s (.toString s)]
-    (if (< (count s) 2)
-      (.toUpperCase s)
-      (str (.toUpperCase (subs s 0 1))
-           (.toLowerCase (subs s 1))))))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Users
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -143,11 +125,12 @@
 
 (defn search-players
   "Returns all player objects with the partial name."
-  [pn]	
-	(filter #(substring? (upper-case pn) (:name %))
+  [pn]
+    (if (not= pn "")   
+	(filter #(substring? (clojure.string/lower-case pn) (clojure.string/lower-case (:name %)))
 	(map #(read-string (:info %))
 	(filter #(not= (:info %) " ")	
-	(with-client client (scan playerTable {:attributes_to_get ["info"]}))))))
+	(with-client client (scan playerTable {:attributes_to_get ["info"]})))))))
 	
 (defn get-roster
   "Returns the player objects associated with the given team."
@@ -193,7 +176,7 @@
 (defn search-teams
   "Returns all team info objects with the partial name."
   [pn]
-   (filter #(substring? (capitalize pn) (:name %))
+   (filter #(substring? (clojure.string/lower-case pn) (clojure.string/lower-case (:name %)))
 	(map #(read-string (:info %))
 	(filter #(not= (:info %) nil)	
 	(with-client client (scan teamTable {:attributes_to_get ["info"]}))))))
