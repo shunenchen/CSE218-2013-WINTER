@@ -16,6 +16,8 @@ var DataToShow = {
 	};
 
 var games_ids = {};
+var players_ids = {};
+var team_names = {};
 var currently_showing = DataToShow.SHOW_GAME_EVENTS;
 
 
@@ -29,7 +31,103 @@ $(document).ready(function() {
 				{		
 					target = document.getElementById('event-box');
 					if (data["events"].length == 0)
-						target.value = "NO EVENTS :(";
+						target.value = "NO EVENTS RECORDED";
+					else 
+					{
+						target.value = "";
+						for (var i = 0; i < data["events"].length; i++) { 
+							if (data["events"][i]["event"]["game_clock"]) {
+								var time = MillisecToMinSec(data["events"][i]["event"]["game_clock"]);
+								var str =  time["mins"] + ":" + time["secs"];
+								while(str.length < 7) str+=" ";
+								target.value += str + " \t\t\t";
+							}
+							else
+								target.value += "??:??" + "\t\t\t";
+							
+							var team_str = "";
+							if (data["events"][i]["event"]["teamId"])
+								team_str = "(" + team_names[data["events"][i]["event"]["teamId"]] + ")";
+							
+							while (team_str.length < 30) team_str+=" ";
+							target.value += team_str+"\t\t\t";
+							
+							if ("ENTER ICE" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["playerName"] + " Enters Ice\t";
+							else if ("EXIT ICE" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["playerName"] + " Exits Ice\t";	
+							else if ("FACEOFF_WON" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["playerName"] + " Wins Faceoff\t";	
+							else if ("FACEOFF_LOST" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["playerName"] + " Loses Faceoff\t";	
+							else if ("SHOT" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["info"] + "\t";	
+							else if ("PENALTY" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["info"] + "\t";	
+							else if ("HIT" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["info"] + "\t";
+							else if ("ASSIST" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["info"] + "\t";
+							else if ("GOAL" === data["events"][i]["event"]["type"])
+								target.value += "GOAL! - " + data["events"][i]["event"]["info"] + "\t";
+							else if ("SAVE" === data["events"][i]["event"]["type"])
+								target.value += data["events"][i]["event"]["playerName"] + " Gets a Save\t";		
+							else if ("Game Start" === data["events"][i]["event"]["type"])
+								target.value += "\tStart of Game\t";	
+							else if ("Game End" === data["events"][i]["event"]["type"])
+								target.value += "\tEnd of Game\t";	
+							else if ("Period Start" === data["events"][i]["event"]["type"])
+								target.value += "\tStart of Period\t";	
+							else if ("Period End" === data["events"][i]["event"]["type"])
+								target.value += "\tEnd of Period\t";	
+							
+							target.value += "\n";
+						}
+					}					
+				});	
+				
+				$.getJSON("/games/"+games_ids[source.options[i].text], function(data,status) 
+				{		
+					target = document.getElementById('selectPlayer');
+					for(var count = target.options.length - 1; count >= 0; count--)
+					{
+						target.options[count] = null;
+					}
+						
+					var away_id = data["awayTeam"]; 
+					$.getJSON("/teams/"+away_id+"/get-roster", function(data,status) 
+					{							
+						target.options[target.options.length]=new Option("=="+team_names[away_id]+"==");
+						
+						for (var i = 0; i < data["data"].length; i++) { 
+							var name = data["data"][i]["name"];
+							while (name < 30) name += " ";
+							var pos = data["data"][i]["position"];
+							var num = data["data"][i]["number"];
+							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
+							target.options[target.options.length]=new Option(str);
+							players_ids[str] = data["data"][i]["id"];
+						}
+																
+					});		 						
+						
+					var home_id = data["homeTeam"]; 
+					$.getJSON("/teams/"+home_id+"/get-roster", function(data,status) 
+					{							
+						target.options[target.options.length]=new Option("");
+						target.options[target.options.length]=new Option("=="+team_names[home_id]+"==");
+						
+						for (var i = 0; i < data["data"].length; i++) { 
+							var name = data["data"][i]["name"];
+							while (name < 30) name += " ";
+							var pos = data["data"][i]["position"];
+							var num = data["data"][i]["number"];
+							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
+							target.options[target.options.length]=new Option(str);
+							players_ids[str] = data["data"][i]["id"];
+						}
+																
+					});		 													
 				});		  	
 			}	
 		}
@@ -38,18 +136,33 @@ $(document).ready(function() {
 
 window.onload=function() {
 	// Populate DOMs
+	document.getElementById('event-box').value = "";	
+	
 	$.getJSON("/games", function(data,status) 
 	{		
 		target = document.getElementById('selectGame');
    				
 		for (var i = 0; i < data["data"].length; i++) { 
-			var dom_txt = data["data"][i]["away"] + " @ " + data["data"][i]["home"] + " (" + EpochToDate(data["data"][i]["scheduled"]) + ")";
+			var dom_txt = getTeamName(data["data"][i]["awayTeam"]) + " @ " + getTeamName(data["data"][i]["homeTeam"]) + " (" + EpochToDate(data["data"][i]["startTime"]) + ")";
 			games_ids[dom_txt] = data["data"][i]["id"];
 			target.options[target.options.length]=new Option(dom_txt);
 		}      
     });	
 	$('.player_events_div').hide();
 };
+
+function getTeamName(teamId) {
+	var teamName = "undefined";
+	$.ajax({
+		type: 'GET',
+		url: "/teams/"+teamId,
+		dataType: 'json',
+		success: function(data) {teamName = data["name"];},
+		async: false
+	});	
+	team_names[teamId] = teamName;
+	return teamName;
+}
 
 function setupPage(dataToShow) {
 	if (dataToShow === DataToShow.SHOW_GAME_EVENTS && currently_showing !== DataToShow.SHOW_GAME_EVENTS)
