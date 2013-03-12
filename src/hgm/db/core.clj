@@ -93,7 +93,6 @@
 (defn create-player
   "Creates a player. player is a map which must include:
    :teamId
-   :position
    Returns the stored player object with an associated :id key."
   [player]
     (let [p (assoc player :id (uuid))]
@@ -142,7 +141,7 @@
   [id]
     (read-string (:info (with-client client (get-item playerTable (create-key id))))))
 
-(defn get-players-name
+(defn search-players
   "Returns all player objects with the partial name."
   [pn]	
 	(filter #(substring? (upper-case pn) (:name %))
@@ -191,7 +190,7 @@
   [id]
     (read-string (:games (with-client client (get-item teamTable (create-key id "GAMES"))))))
 
-(defn get-team-name
+(defn search-teams
   "Returns all team info objects with the partial name."
   [pn]
    (filter #(substring? (capitalize pn) (:name %))
