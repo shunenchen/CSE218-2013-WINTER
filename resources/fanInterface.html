@@ -16,6 +16,7 @@ var DataToShow = {
 	};
 
 var games_ids = {};
+var players_ids = {};
 var team_names = {};
 var currently_showing = DataToShow.SHOW_GAME_EVENTS;
 
@@ -82,7 +83,51 @@ $(document).ready(function() {
 							
 							target.value += "\n";
 						}
+					}					
+				});	
+				
+				$.getJSON("/games/"+games_ids[source.options[i].text], function(data,status) 
+				{		
+					target = document.getElementById('selectPlayer');
+					for(var count = target.options.length - 1; count >= 0; count--)
+					{
+						target.options[count] = null;
 					}
+						
+					var away_id = data["awayTeam"]; 
+					$.getJSON("/teams/"+away_id+"/get-roster", function(data,status) 
+					{							
+						target.options[target.options.length]=new Option("=="+team_names[away_id]+"==");
+						
+						for (var i = 0; i < data["data"].length; i++) { 
+							var name = data["data"][i]["name"];
+							while (name < 30) name += " ";
+							var pos = data["data"][i]["position"];
+							var num = data["data"][i]["number"];
+							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
+							target.options[target.options.length]=new Option(str);
+							players_ids[str] = data["data"][i]["id"];
+						}
+																
+					});		 						
+						
+					var home_id = data["homeTeam"]; 
+					$.getJSON("/teams/"+home_id+"/get-roster", function(data,status) 
+					{							
+						target.options[target.options.length]=new Option("");
+						target.options[target.options.length]=new Option("=="+team_names[home_id]+"==");
+						
+						for (var i = 0; i < data["data"].length; i++) { 
+							var name = data["data"][i]["name"];
+							while (name < 30) name += " ";
+							var pos = data["data"][i]["position"];
+							var num = data["data"][i]["number"];
+							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
+							target.options[target.options.length]=new Option(str);
+							players_ids[str] = data["data"][i]["id"];
+						}
+																
+					});		 													
 				});		  	
 			}	
 		}
@@ -91,6 +136,8 @@ $(document).ready(function() {
 
 window.onload=function() {
 	// Populate DOMs
+	document.getElementById('event-box').value = "";	
+	
 	$.getJSON("/games", function(data,status) 
 	{		
 		target = document.getElementById('selectGame');
