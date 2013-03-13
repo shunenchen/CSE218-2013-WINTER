@@ -77,88 +77,16 @@
 <div id="content">
 	<div id="mainContent">
         <div id="hometeam">
-        <h3>Home Team</h3>
+        <h3 id="homeHead">Home: </h3>
             <form>
-                <table>
-                    <tr>
-                        <td><input type="button" value="Forward 1" id="home1" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 2" id="home2" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 3" id="home3" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Forward 4" id="home4" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 5" id="home5" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 6" id="home6" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Forward 7" id="home7" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 8" id="home8" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 9" id="home9" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Forward 10" id="home10" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 11" id="home11" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Forward 12" id="home12" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Defense 1" id="home13" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Defense 2" id="home14" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Defense 3" id="home15" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Defense 4" id="home16" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Defense 5" id="home17" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Defense 6" id="home18" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Goalie 1" id="home19" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                        <td><input type="button" value="Goalie 2" id="home20" class="unselected" onclick="SelectPlayer(id, 'home')"></td>
-                    </tr>
+                <table id='homeTable'>
                 </table>
             </form>
         </div>
         <div id="awayteam">
-        <h3>Away Team</h3>
+        <h3 id="awayHead">Away: </h3>
             <form>
-                <table>
-                    <tr>
-                        <td><input type="button" value="Forward 1" id="away1" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 2" id="away2" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 3" id="away3" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Forward 4" id="away4" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 5" id="away5" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 6" id="away6" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Forward 7" id="away7" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 8" id="away8" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 9" id="away9" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Forward 10" id="away10" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 11" id="away11" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Forward 12" id="away12" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Defense 1" id="away13" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Defense 2" id="away14" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Defense 3" id="away15" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Defense 4" id="away16" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Defense 5" id="away17" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Defense 6" id="away18" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="button" value="Goalie 1" id="away19" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                        <td><input type="button" value="Goalie 2" id="away20" class="unselected" onclick="SelectPlayer(id, 'away')"></td>
-                    </tr>
+                <table id='awayTable'>
                 </table>
             </form>
         </div>

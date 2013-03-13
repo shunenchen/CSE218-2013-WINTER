@@ -73,16 +73,99 @@ $(document).ready(function() {
           var awayStart = GAME_ID.indexOf('-') + 1;
           var awayEnd = GAME_ID.indexOf('@');
           var homeStart = awayEnd + 1;
+          var match = game.match(/^(.*)\s*@\s*(.*)\s\(/);
           AWAY.id = GAME_ID.substring(awayStart, awayEnd);
+          AWAY.name = match[1];
           HOME.id = GAME_ID.substring(homeStart);
-          
+          HOME.name = match[2];
           console.log(AWAY.id);
           console.log(HOME.id);
+                 
+          // populate the away team
+          $.getJSON("/teams/" + AWAY.id + "/get-roster", function(data,status) {
+            $('#awayHead').append(AWAY.name);
+            target = $('#awayTable');
+            var awayTeam = data.data;
+            
+            // generate tr
+            var tr = $("<tr></tr>");
+            var forwards = $.grep(awayTeam, function (e) { return e.position === "forward"; });
+            var defense = $.grep(awayTeam, function (e) { return e.position === "defender"; });
+            var goalies = $.grep(awayTeam, function (e) { return e.position === "goalie"; });
+            console.log(goalies);
+            for (var i = 0; i < forwards.length; i++) {
+                tr.append("<td><input type=\"button\" value=\""+forwards[i].number+"\" id=\""+forwards[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'away')\"></td>");
+                if (i % 3 === 2) {
+                    target.append(tr);
+                    tr = $("<tr></tr>");
+                }
+            }
+            target.append(tr);
+            tr = $("<tr></tr>");
+            for (var i = 0; i < defense.length; i++) {
+                tr.append("<td><input type=\"button\" value=\""+defense[i].number+"\" id=\""+defense[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'away')\"></td>");
+                if (i % 2 === 1) {
+                    target.append(tr);
+                    tr = $("<tr></tr>");
+                }
+            }
+            target.append(tr);
+            tr = $("<tr></tr>");
+            for (var i = 0; i < goalies.length; i++) {
+                tr.append("<td><input type=\"button\" value=\""+goalies[i].number+"\" id=\""+goalies[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'away')\"></td>");
+                if (i % 2 === 1) {
+                    target.append(tr);
+                    tr = $("<tr></tr>");
+                }
+            }
+            target.append(tr);
+          });
+
+          // populate the home team
+          $.getJSON("/teams/" + HOME.id + "/get-roster", function(data,status) {
+            $('#homeHead').append(HOME.name);
+            target = $('#homeTable');
+            var homeTeam = data.data;
+            console.log(homeTeam);
+            
+            // generate tr
+            var tr = $("<tr></tr>");
+            var forwards = $.grep(homeTeam, function (e) { return e.position === "forward"; });
+            var defense = $.grep(homeTeam, function (e) { return e.position === "defender"; });
+            var goalies = $.grep(homeTeam, function (e) { return e.position === "goalie"; });
+            console.log(goalies);
+            for (var i = 0; i < forwards.length; i++) {
+                tr.append("<td><input type=\"button\" value=\""+forwards[i].number+"\" id=\""+forwards[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'home')\"></td>");
+                if (i % 3 === 2) {
+                    target.append(tr);
+                    tr = $("<tr></tr>");
+                }
+            }
+            target.append(tr);
+            tr = $("<tr></tr>");
+            for (var i = 0; i < defense.length; i++) {
+                tr.append("<td><input type=\"button\" value=\""+defense[i].number+"\" id=\""+defense[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'home')\"></td>");
+                if (i % 2 === 1) {
+                    target.append(tr);
+                    tr = $("<tr></tr>");
+                }
+            }
+            target.append(tr);
+            tr = $("<tr></tr>");
+            for (var i = 0; i < goalies.length; i++) {
+                tr.append("<td><input type=\"button\" value=\""+goalies[i].number+"\" id=\""+goalies[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'home')\"></td>");
+                if (i % 2 === 1) {
+                    target.append(tr);
+                    tr = $("<tr></tr>");
+                }
+            }
+            target.append(tr);
+          });
           
+          // kill the popup
           popup('popUpDivSelect');
 
-          //$.post("/games", {home: homeId, away: awayId, startTime:
-//                              ts}, "json").fail(function (e) { console.log(e); });
+
 
           return false;
         });
