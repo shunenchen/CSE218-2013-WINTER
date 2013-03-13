@@ -42,6 +42,7 @@ $(document).ready(function() {
 					var away_id = data["awayTeam"]; 
 					$.getJSON("/teams/"+away_id+"/get-roster", function(data,status) 
 					{							
+						players_ids[target.options.length]=0;
 						target.options[target.options.length]=new Option("=="+team_names[away_id]+"==");
 						
 						for (var i = 0; i < data["data"].length; i++) { 
@@ -62,6 +63,7 @@ $(document).ready(function() {
 					var home_id = data["homeTeam"]; 
 					$.getJSON("/teams/"+home_id+"/get-roster", function(data,status) 
 					{							
+						players_ids[target.options.length]=0;
 						target.options[target.options.length]=new Option("=="+team_names[home_id]+"==");
 						
 						for (var i = 0; i < data["data"].length; i++) { 
@@ -149,7 +151,7 @@ $(document).ready(function() {
 	$("#selectPlayer").on("change", function() { 
 		var source = document.getElementById('selectPlayer');
 		for(var i=(source.options.length-1); i>=0; i--){
-			if(source.options[i].selected && players_ids[i] != null){	
+			if(source.options[i].selected && players_ids[i] != 0){	
 				$.getJSON("/players/"+players_ids[i]+"/stats", function(data,status) 
 				{							
 					var target = document.getElementById('career-stats');
