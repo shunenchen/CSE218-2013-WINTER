@@ -2,6 +2,7 @@
 <html>
 <head>
 <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+<script src="https://raw.github.com/dinbror/bpopup/master/jquery.bpopup.min.js"></script>
 <script src="/epochUtils.js"></script>
 <title>Hockey Game Manager</title>
 <meta charset="UTF-8" />
@@ -12,7 +13,8 @@
 var DataToShow = { 
 	SHOW_GAME_EVENTS	: 0, 
 	SHOW_PLAYER_STATS	: 1, 
-	SHOW_TEAMS_STATS		: 2 
+	SHOW_TEAMS_STATS	: 2, 
+	SHOW_SEARCH			: 3
 	};
 
 var games_ids = {};
@@ -215,6 +217,8 @@ function setupPage(dataToShow) {
 		$('.player_events_div').hide();
 		$('.teams_stats_div').hide();
 		$('.game_stats_div').show();
+		$('.games_content').show();
+		$('.search_content').hide();
 		currently_showing = DataToShow.SHOW_GAME_EVENTS;
 	}
 	else if (dataToShow === DataToShow.SHOW_PLAYER_STATS && currently_showing !== DataToShow.SHOW_PLAYER_STATS)
@@ -222,6 +226,8 @@ function setupPage(dataToShow) {
 		$('.game_stats_div').hide();
 		$('.teams_stats_div').hide();
 		$('.player_events_div').show();
+		$('.games_content').show();
+		$('.search_content').hide();
 		currently_showing = DataToShow.SHOW_PLAYER_STATS;
 	}
 	else if (dataToShow === DataToShow.SHOW_TEAMS_STATS && currently_showing !== DataToShow.SHOW_TEAMS_STATS)
@@ -229,7 +235,15 @@ function setupPage(dataToShow) {
 		$('.game_stats_div').hide();
 		$('.teams_stats_div').show();
 		$('.player_events_div').hide();		
+		$('.games_content').show();
+		$('.search_content').hide();
 		currently_showing = DataToShow.SHOW_TEAMS_STATS;
+	}
+	else if (dataToShow === DataToShow.SHOW_SEARCH && currently_showing !== DataToShow.SHOW_SEARCH)
+	{	
+		$('.games_content').hide();
+		$('.search_content').show();
+		currently_showing = DataToShow.SHOW_SEARCH;
 	}
 }
 
@@ -243,11 +257,12 @@ function setupPage(dataToShow) {
 	  <label>Fan Interface</label>	  
 	</fieldset>
     
-	<content>	  
-            <td align="left">Games:</td> </br>
+	<content class="games_content">	  
+            <td align="left">Games | <a onClick=setupPage(DataToShow.SHOW_SEARCH)>Search</a></td> </br>
             <td align="left"><select name="selectGame" id="selectGame" style="width: 600px;">
             </select></td>
             <button type="submit" id="show-event" class="btn" style="visibility: visible">Update</button>
+        
         	</br> 
             <a onClick=setupPage(DataToShow.SHOW_GAME_EVENTS)>Game Events</a>  |  <a onClick=setupPage(DataToShow.SHOW_PLAYER_STATS)>Player Stats</a>  |  <a onClick=setupPage(DataToShow.SHOW_TEAMS_STATS)>Teams Stats</a>
             
@@ -276,6 +291,24 @@ Away Team Stats:
                 <textarea readonly id="home-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
 Home Team Stats:
                 </textarea>        
+            </div>
+	</content>
+    
+    <content class="search_content">	  
+            <td align="left"><a onClick=setupPage(DataToShow.SHOW_GAME_EVENTS)>Games</a> | Search</td> </br></br>
+            <td align="left"><form onsubmit="" style="width: 600px;">
+            <input type="text" name="q" />
+            </form></td>
+        
+        	</br>         
+            
+            <div class="search_result_div">             	
+                <select id="player-search" size="4" style="width: 465px; height: 400px; margin-top: 10px; resize: none;">
+                <option>Player search results</option>
+                </select>   
+                <select id="team_search" size="4" style="width: 465px; height: 400px; margin-top: 10px; resize: none;">
+                <option>Team search results</option>
+                </select>        
             </div>
 	</content>
     
