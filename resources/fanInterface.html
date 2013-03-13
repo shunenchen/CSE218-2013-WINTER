@@ -12,7 +12,7 @@
 var DataToShow = { 
 	SHOW_GAME_EVENTS	: 0, 
 	SHOW_PLAYER_STATS	: 1, 
-	SHOW_TEAMS_INFO		: 2 
+	SHOW_TEAMS_STATS		: 2 
 	};
 
 var games_ids = {};
@@ -36,8 +36,8 @@ $(document).ready(function() {
 					{
 						target.value = "";
 						for (var i = 0; i < data["events"].length; i++) { 
-							if (data["events"][i]["event"]["game_clock"] != undefined) {
-								var time = MillisecToMinSec(data["events"][i]["event"]["game_clock"]);
+							if (data["events"][i]["game_clock"] != undefined) {
+								var time = MillisecToMinSec(data["events"][i]["game_clock"]);
 								var str =  time["mins"] + ":" + time["secs"];
 								while(str.length < 7) str+=" ";
 								target.value += str + " \t\t\t";
@@ -46,44 +46,44 @@ $(document).ready(function() {
 								target.value += "??:??" + "\t\t\t";
 							
 							var team_str = "";
-							if (data["events"][i]["event"]["teamId"])
-								team_str = "(" + team_names[data["events"][i]["event"]["teamId"]] + ")";
+							if (data["events"][i]["teamId"])
+								team_str = "(" + team_names[data["events"][i]["teamId"]] + ")";
 							
 							while (team_str.length < 30) team_str+=" ";
 							target.value += team_str+"\t\t\t";
 							
-							if ("ENTER ICE" === data["events"][i]["event"]["type"])
-								target.value += data["events"][i]["event"]["playerName"] + " Enters Ice\t";
-							else if ("EXIT ICE" === data["events"][i]["event"]["type"])
-								target.value += data["events"][i]["event"]["playerName"] + " Exits Ice\t";	
-							else if ("FACEOFF_WON" === data["events"][i]["event"]["type"])
-								target.value += data["events"][i]["event"]["playerName"] + " Wins Faceoff\t";	
-							else if ("FACEOFF_LOST" === data["events"][i]["event"]["type"])
-								target.value += data["events"][i]["event"]["playerName"] + " Loses Faceoff\t";	
-							else if ("SHOT" === data["events"][i]["event"]["type"])
-								target.value += data["events"][i]["event"]["info"] + "\t";	
-							else if ("PENALTY" === data["events"][i]["event"]["type"])
-								target.value += data["events"][i]["event"]["info"] + "\t";	
-							else if ("HIT" === data["events"][i]["event"]["type"])
-								target.value += data["events"][i]["event"]["info"] + "\t";
-							else if ("ASSIST" === data["events"][i]["event"]["type"])
-								target.value += data["events"][i]["event"]["info"] + "\t";
-							else if ("GOAL" === data["events"][i]["event"]["type"])
-								target.value += "GOAL! - " + data["events"][i]["event"]["info"] + "\t";
-							else if ("SAVE" === data["events"][i]["event"]["type"])
-								target.value += data["events"][i]["event"]["playerName"] + " Gets a Save\t";		
-							else if ("Game Start" === data["events"][i]["event"]["type"])
+							if ("ENTER ICE" === data["events"][i]["type"])
+								target.value += data["events"][i]["playerName"] + " Enters Ice\t";
+							else if ("EXIT ICE" === data["events"][i]["type"])
+								target.value += data["events"][i]["playerName"] + " Exits Ice\t";	
+							else if ("FACEOFF_WON" === data["events"][i]["type"])
+								target.value += data["events"][i]["playerName"] + " Wins Faceoff\t";	
+							else if ("FACEOFF_LOST" === data["events"][i]["type"])
+								target.value += data["events"][i]["playerName"] + " Loses Faceoff\t";	
+							else if ("SHOT" === data["events"][i]["type"])
+								target.value += data["events"][i]["info"] + "\t";	
+							else if ("PENALTY" === data["events"][i]["type"])
+								target.value += data["events"][i]["info"] + "\t";	
+							else if ("HIT" === data["events"][i]["type"])
+								target.value += data["events"][i]["info"] + "\t";
+							else if ("ASSIST" === data["events"][i]["type"])
+								target.value += data["events"][i]["info"] + "\t";
+							else if ("GOAL" === data["events"][i]["type"])
+								target.value += "GOAL! - " + data["events"][i]["info"] + "\t";
+							else if ("SAVE" === data["events"][i]["type"])
+								target.value += data["events"][i]["playerName"] + " Gets a Save\t";		
+							else if ("Game Start" === data["events"][i]["type"])
 								target.value += "\tStart of Game\t";	
-							else if ("Game End" === data["events"][i]["event"]["type"])
+							else if ("Game End" === data["events"][i]["type"])
 								target.value += "\tEnd of Game\t";	
-							else if ("Period Start" === data["events"][i]["event"]["type"])
+							else if ("Period Start" === data["events"][i]["type"])
 								target.value += "\tStart of Period\t";	
-							else if ("Period End" === data["events"][i]["event"]["type"])
+							else if ("Period End" === data["events"][i]["type"])
 								target.value += "\tEnd of Period\t";	
 							
 							target.value += "\n";
 						}
-					}					
+					}	
 				});	
 				
 				$.getJSON("/games/"+games_ids[source.options[i].text], function(data,status) 
@@ -99,22 +99,21 @@ $(document).ready(function() {
 					{							
 						target.options[target.options.length]=new Option("=="+team_names[away_id]+"==");
 						
-for (var i = 0; i < data["data"].length; i++) { 
-	var name = data["data"][i]["name"];
-	while (name < 30) name += " ";
-	var pos = data["data"][i]["position"];
-	var num = data["data"][i]["number"];
-	var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
-	target.options[target.options.length]=new Option(str);
-	players_ids[str] = data["data"][i]["id"];
-}
+						for (var i = 0; i < data["data"].length; i++) { 
+							var name = data["data"][i]["name"];
+							while (name < 30) name += " ";
+							var pos = data["data"][i]["position"];
+							var num = data["data"][i]["number"];
+							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
+							players_ids[target.options.length] = data["data"][i]["id"];
+							target.options[target.options.length]=new Option(str);
+						}
 																
 					});		 						
 						
 					var home_id = data["homeTeam"]; 
 					$.getJSON("/teams/"+home_id+"/get-roster", function(data,status) 
 					{							
-						target.options[target.options.length]=new Option("");
 						target.options[target.options.length]=new Option("=="+team_names[home_id]+"==");
 						
 						for (var i = 0; i < data["data"].length; i++) { 
@@ -123,8 +122,9 @@ for (var i = 0; i < data["data"].length; i++) {
 							var pos = data["data"][i]["position"];
 							var num = data["data"][i]["number"];
 							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
-							target.options[target.options.length]=new Option(str);
-							players_ids[str] = data["data"][i]["id"];
+							players_ids[target.options.length] = data["data"][i]["id"];	
+							//console.log(players_ids[target.options.length]);
+							target.options[target.options.length]=new Option(str);							
 						}
 																
 					});		 													
@@ -132,17 +132,57 @@ for (var i = 0; i < data["data"].length; i++) {
 			}	
 		}
   	});
-        $("#selectPlayer").on("change", function() { 
-                var player = $("option:selected", this);
-                console.log(players_ids[player]);
-        });
+        
+	$("#selectPlayer").on("change", function() { 
+		var source = document.getElementById('selectPlayer');
+		for(var i=(source.options.length-1); i>=0; i--){
+			if(source.options[i].selected && players_ids[i] != null){	
+				$.getJSON("/players/"+players_ids[i]+"/stats", function(data,status) 
+				{							
+					var target = document.getElementById('career-stats');
+					target.value = "== CAREER STATS ==\n";
+					target.value += "Goals:       \t\t" + data["goals"] + "\n";		
+					target.value += "Assists:     \t\t" + data["assists"] + "\n";	
+					target.value += "Plus Minus:  \t\t" + data["plusMinus"] + "\n";		
+					target.value += "Shots:       \t\t" + data["shots"] + "\n";		
+					target.value += "Hits:          \t\t" + data["hits"] + "\n";																	
+				});		 
+				
+				var select_game = document.getElementById('selectGame');
+				
+				for(var j=(select_game.options.length-1); j>=0; j--){
+					if(select_game.options[j].selected){		
+						$.getJSON("/players/"+players_ids[i]+"/stats/for-game/"+games_ids[select_game.options[j].text], function(data,status) 
+						{			
+							var target = document.getElementById('game-stats');				
+							target.value = "== GAME STATS ==\n";
+							target.value += "Goals:       \t\t" + data["goals"] + "\n";		
+							target.value += "Assists:     \t\t" + data["assists"] + "\n";	
+							target.value += "Plus Minus:  \t\t" + data["plusMinus"] + "\n";		
+							target.value += "Shots:       \t\t" + data["shots"] + "\n";		
+							target.value += "Hits:          \t\t" + data["hits"] + "\n";																	
+						});		 		
+					}
+				}
+			}
+			else
+			{
+				document.getElementById('career-stats').value = "== CAREER STATS ==";
+				document.getElementById('game-stats').value = "== GAME STATS ==";
+			}
+		}
+	});
 });	
 
 window.onload=function() {
 	// Populate DOMs
 	document.getElementById('event-box').value = "";	
+	document.getElementById('career-stats').value = "== CAREER STATS ==";
+	document.getElementById('game-stats').value = "== GAME STATS ==";
+	document.getElementById('home-stats').value = "== HOME STATS ==";
+	document.getElementById('away-stats').value = "== AWAY STATS ==";
 	
-	$.getJSON("/games", function(data,status) 
+	$.getJSON("/games", function(data,status) 	
 	{		
 		target = document.getElementById('selectGame');
    				
@@ -173,23 +213,23 @@ function setupPage(dataToShow) {
 	{
 		showing_game_events = true;
 		$('.player_events_div').hide();
-		$('.teams_info_div').hide();
-		$('.game_events_div').show();
+		$('.teams_stats_div').hide();
+		$('.game_stats_div').show();
 		currently_showing = DataToShow.SHOW_GAME_EVENTS;
 	}
 	else if (dataToShow === DataToShow.SHOW_PLAYER_STATS && currently_showing !== DataToShow.SHOW_PLAYER_STATS)
 	{
-		$('.game_events_div').hide();
-		$('.teams_info_div').hide();
+		$('.game_stats_div').hide();
+		$('.teams_stats_div').hide();
 		$('.player_events_div').show();
 		currently_showing = DataToShow.SHOW_PLAYER_STATS;
 	}
-	else if (dataToShow === DataToShow.SHOW_TEAMS_INFO && currently_showing !== DataToShow.SHOW_TEAMS_INFO)
+	else if (dataToShow === DataToShow.SHOW_TEAMS_STATS && currently_showing !== DataToShow.SHOW_TEAMS_STATS)
 	{
-		$('.game_events_div').hide();
-		$('.teams_info_div').show();
+		$('.game_stats_div').hide();
+		$('.teams_stats_div').show();
 		$('.player_events_div').hide();		
-		currently_showing = DataToShow.SHOW_TEAMS_INFO;
+		currently_showing = DataToShow.SHOW_TEAMS_STATS;
 	}
 }
 
@@ -209,9 +249,9 @@ function setupPage(dataToShow) {
             </select></td>
             <button type="submit" id="show-event" class="btn" style="visibility: visible">Update</button>
         	</br> 
-            <a onClick=setupPage(DataToShow.SHOW_GAME_EVENTS)>Game Events</a>  |  <a onClick=setupPage(DataToShow.SHOW_PLAYER_STATS)>Player Events</a>  |  <a onClick=setupPage(DataToShow.SHOW_TEAMS_INFO)>Teams Info</a>
+            <a onClick=setupPage(DataToShow.SHOW_GAME_EVENTS)>Game Events</a>  |  <a onClick=setupPage(DataToShow.SHOW_PLAYER_STATS)>Player Stats</a>  |  <a onClick=setupPage(DataToShow.SHOW_TEAMS_STATS)>Teams Stats</a>
             
-            <div class="game_events_div">
+            <div class="game_stats_div">
                 <textarea readonly id="event-box" rows="4" style="width: 940px; height: 440px; margin-top: 10px; resize: none;">
                 </textarea>          
             </div>
@@ -229,12 +269,12 @@ Career Stats:
                 </textarea>        
             </div>
             
-            <div class="teams_info_div">             	
-                <textarea readonly id="game-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
-Away Team Info:
+            <div class="teams_stats_div">             	
+                <textarea readonly id="away-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
+Away Team Stats:
                 </textarea>   
-                <textarea readonly id="career-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
-Home Team Info:
+                <textarea readonly id="home-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
+Home Team Stats:
                 </textarea>        
             </div>
 	</content>
