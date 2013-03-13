@@ -42,6 +42,7 @@ $(document).ready(function() {
 					var away_id = data["awayTeam"]; 
 					$.getJSON("/teams/"+away_id+"/get-roster", function(data,status) 
 					{							
+						target.options[target.options.length]=null;
 						target.options[target.options.length]=new Option("=="+team_names[away_id]+"==");
 						
 						for (var i = 0; i < data["data"].length; i++) { 
@@ -62,6 +63,7 @@ $(document).ready(function() {
 					var home_id = data["homeTeam"]; 
 					$.getJSON("/teams/"+home_id+"/get-roster", function(data,status) 
 					{							
+						target.options[target.options.length]=null;
 						target.options[target.options.length]=new Option("=="+team_names[home_id]+"==");
 						
 						for (var i = 0; i < data["data"].length; i++) { 
