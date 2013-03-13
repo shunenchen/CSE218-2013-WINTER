@@ -164,7 +164,7 @@ $(document).ready(function() {
 						$.getJSON("/players/"+players_ids[i]+"/stats/for-game/"+games_ids[select_game.options[j].text], function(data,status) 
 						{			
 							var target = document.getElementById('game-stats');				
-                                                        console.log(data);
+                            //console.log(data);
 							target.value = "== GAME STATS ==\n";
 							target.value += "Goals:       \t\t" + data["goals"] + "\n";		
 							target.value += "Assists:     \t\t" + data["assists"] + "\n";	
@@ -343,7 +343,9 @@ function teamResultsOverlay()
 	
 	var source = document.getElementById('team_search');
 	for(var i=(source.options.length-1); i>=0; i--){
-			if(source.options[i].selected){	
+			if(source.options[i].selected && i != 0){	
+				var popup_content = "<div><h1>"+source.options[i].text+"</h1></div>";
+				$.modal(popup_content, {overlayClose:true});	
 				source.options[i].selected = false;	
 			}
 	}
