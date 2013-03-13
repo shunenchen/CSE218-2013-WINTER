@@ -28,22 +28,22 @@ function Queue(){
 };
 
 function getTeamName(teamId) {
-	var teamName = "undefined";
-	$.ajax({
-		type: 'GET',
-		url: "/teams/"+teamId,
-		dataType: 'json',
-		success: function(data) {teamName = data["name"];},
-		async: false
-	});	
-	team_names[teamId] = teamName;
-	return teamName;
+        var teamName = "undefined";
+        $.ajax({
+                type: 'GET',
+                url: "/teams/"+teamId,
+                dataType: 'json',
+                success: function(data) {teamName = data["name"];},
+                async: false
+        });
+        team_names[teamId] = teamName;
+        return teamName;
 }
 
-var GAME_ID = "0001366936200-4532f8ad-e638-43a3-8de7-b8d4f4b7845b@46b24778-e521-4c76-b714-1c61450242ec";
+var GAME_ID = "";
 
-var HOME = { id: "46b24778-e521-4c76-b714-1c61450242ec" };
-var AWAY = { id: "4532f8ad-e638-43a3-8de7-b8d4f4b7845b" };
+var HOME = {  };
+var AWAY = {  };
 
 var game_ids = {};
 var team_names = {};
@@ -52,19 +52,19 @@ var team_names = {};
 $(document).ready(function() {
     console.log('hello');
     popup('popUpDivSelect');
-            
-    
-    $.getJSON("/games", function(data,status) 	
-	{		
-		target = document.getElementById('selectGame');
-   				
-		for (var i = 0; i < data["data"].length; i++) { 
-			var dom_txt = getTeamName(data["data"][i]["awayTeam"]) + " @ " + getTeamName(data["data"][i]["homeTeam"]) + " (" + EpochToDate(data["data"][i]["startTime"]) + ")";
-			game_ids[dom_txt] = data["data"][i]["id"];
-			target.options[target.options.length]=new Option(dom_txt);
-		}      
-    });	
-    
+
+
+    $.getJSON("/games", function(data,status)
+        {
+                target = document.getElementById('selectGame');
+
+                for (var i = 0; i < data["data"].length; i++) {
+                        var dom_txt = getTeamName(data["data"][i]["awayTeam"]) + " @ " + getTeamName(data["data"][i]["homeTeam"]) + " (" + EpochToDate(data["data"][i]["startTime"]) + ")";
+                        game_ids[dom_txt] = data["data"][i]["id"];
+                        target.options[target.options.length]=new Option(dom_txt);
+                }
+    });
+
     $("#chooseGame").submit(function() {
           var game = $("#selectGame").val();
           console.log(game);
@@ -80,18 +80,19 @@ $(document).ready(function() {
           HOME.name = match[2];
           console.log(AWAY.id);
           console.log(HOME.id);
-                 
+
           // populate the away team
           $.getJSON("/teams/" + AWAY.id + "/get-roster", function(data,status) {
             $('#awayHead').append(AWAY.name);
             target = $('#awayTable');
-            var awayTeam = data.data;
-            
+            AWAY.players = data.data;
+
+
             // generate tr
             var tr = $("<tr></tr>");
-            var forwards = $.grep(awayTeam, function (e) { return e.position === "forward"; });
-            var defense = $.grep(awayTeam, function (e) { return e.position === "defender"; });
-            var goalies = $.grep(awayTeam, function (e) { return e.position === "goalie"; });
+            var forwards = $.grep(AWAY.players, function (e) { return e.position === "forward"; });
+            var defense = $.grep(AWAY.players, function (e) { return e.position === "defender"; });
+            var goalies = $.grep(AWAY.players, function (e) { return e.position === "goalie"; });
             console.log(goalies);
             for (var i = 0; i < forwards.length; i++) {
                 tr.append("<td><input type=\"button\" value=\""+forwards[i].number+"\" id=\""+forwards[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'away')\"></td>");
@@ -125,14 +126,13 @@ $(document).ready(function() {
           $.getJSON("/teams/" + HOME.id + "/get-roster", function(data,status) {
             $('#homeHead').append(HOME.name);
             target = $('#homeTable');
-            var homeTeam = data.data;
-            console.log(homeTeam);
-            
+            HOME.players = data.data;
+
             // generate tr
             var tr = $("<tr></tr>");
-            var forwards = $.grep(homeTeam, function (e) { return e.position === "forward"; });
-            var defense = $.grep(homeTeam, function (e) { return e.position === "defender"; });
-            var goalies = $.grep(homeTeam, function (e) { return e.position === "goalie"; });
+            var forwards = $.grep(HOME.players, function (e) { return e.position === "forward"; });
+            var defense = $.grep(HOME.players, function (e) { return e.position === "defender"; });
+            var goalies = $.grep(HOME.players, function (e) { return e.position === "goalie"; });
             console.log(goalies);
             for (var i = 0; i < forwards.length; i++) {
                 tr.append("<td><input type=\"button\" value=\""+forwards[i].number+"\" id=\""+forwards[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'home')\"></td>");
@@ -161,7 +161,7 @@ $(document).ready(function() {
             }
             target.append(tr);
           });
-          
+
           // kill the popup
           popup('popUpDivSelect');
 
@@ -174,22 +174,22 @@ $(document).ready(function() {
 
 
 
-      
+
 
 //Game Timer Functions
 function StartTime(id,srt){
     $.post("/events/start-game", {
         gameId: GAME_ID,
-        startTime: Date.now(),
+        startTime: Math.round(Date.now() / 1000),
         home: { teamId: HOME.id,
                 // these should not be the same!
-                roster: HOME.players,
-                starting: HOME.players
+                roster: $.map(HOME.players, function (p) { return p.id; }),
+                starting: $.map(HOME.players, function (p) { return p.id; })
               },
         away: { teamId: AWAY.id,
                 // these should not be the same!
-                roster: AWAY.players,
-                starting: AWAY.players
+                roster: $.map(AWAY.players, function (p) { return p.id; }),
+                starting: $.map(AWAY.players, function (p) { return p.id; })
               }
     }// , function (data) {
      //    GAME_ID = data.gameId;
@@ -255,6 +255,7 @@ var maxAway = 5;
 function SelectPlayer(player, team){
         var time = GetTime('time');
         var obj = document.getElementById(player);
+        var val = parseInt(obj.value);
         if (obj.className == "unselected"){
                 if (team == "home" && homeSelected <= maxHome){
                         if (!homeQueue.isEmpty()){
@@ -262,24 +263,24 @@ function SelectPlayer(player, team){
                                 var outPlayer = homeQueue.dequeue();
 
                                 //add player to the on ice tracker
-                                homeOnIce.push(obj.value);
+                                homeOnIce.push(val);
 
 
                             //send outplayer and 'inplayer'
                             console.log(time);	//time the switch occured
                             console.log(outPlayer);	//player leaving the ice
-                            console.log(obj.value);	//player entering the ice
+                            console.log(val);	//player entering the ice
                             $.post("/events/swap-players", {
                                 gameId: GAME_ID,
                                 time: timeToStamp(time),
-                                outPlayer: outPlayer,
-                                inPlayer: obj.value
+                                outPlayer: lookupPlayer(HOME, outPlayer).id,
+                                inPlayer: lookupPlayer(HOME, val).id
                             }).done(function(data){console.log(data);});
                         }
                         else { //The first time all the players have been on the ice
-                                console.log(obj.value);
+                                console.log(val);
                                 console.log(time);
-                                homeOnIce.push(obj.value);
+                                homeOnIce.push(val);
                         }
                         console.log(homeQueue.isEmpty());
                         obj.className = "selected";
@@ -292,23 +293,23 @@ function SelectPlayer(player, team){
                             var outPlayer = awayQueue.dequeue();
 
                             //add our player to the on ice tracker
-                            awayOnIce.push(obj.value);
+                            awayOnIce.push(val);
 
                             //send outplayer and 'inplayer'
                             console.log(time);	//time the switch occured
                             console.log(outPlayer);	//player leaving the ice
-                            console.log(obj.value);	//player entering the ice
+                            console.log(val);	//player entering the ice
                             $.post("/events/swap-players", {
                                 gameId: GAME_ID,
                                 time: timeToStamp(time),
-                                outPlayer: outPlayer,
-                                inPlayer: obj.value
+                                outPlayer: lookupPlayer(AWAY, outPlayer).id,
+                                inPlayer: lookupPlayer(AWAY, val).id
                             }).done(function(data){console.log(data);});;
                         }
                         else { //The first time all the players have been on the ice
-                                console.log(obj.value);
+                                console.log(val);
                                 console.log(time);
-                                awayOnIce.push(obj.value);
+                                awayOnIce.push(val);
                         }
                         obj.className = "selected";
                         awaySelected += 1;
@@ -321,7 +322,7 @@ function SelectPlayer(player, team){
                         var index = awayOnIce.indexOf(outPlayer)
                         awayOnIce.splice(index, 1);
                         //add the player to the timeonice queue and players on ice
-                        awayQueue.enqueue(obj.value);
+                        awayQueue.enqueue(val);
                 }
                 else {
                         homeSelected -= 1;
@@ -329,7 +330,7 @@ function SelectPlayer(player, team){
                         var index = homeOnIce.indexOf(outPlayer)
                         homeOnIce.splice(index, 1);
                         //add the player to the timeonice queue and players on ice
-                        homeQueue.enqueue(obj.value);
+                        homeQueue.enqueue(val);
                 }
                 obj.className = "unselected";
         }
@@ -667,4 +668,3 @@ function loadPlayers() {
     });
 }
 
-$(loadPlayers);
