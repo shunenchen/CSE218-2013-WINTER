@@ -312,7 +312,7 @@
       (with-client client (put-item gameEventTable
         { :gameId gameId
           :clockUuid clockUuid
-          :event (str event)}))
+         :event (str (assoc event :time clock))}))
        clockUuid))
 
 (defn remove-game-event
@@ -336,15 +336,18 @@
   1: later than or equal time
   2: between clock values - inclusive of the first clock."
   ([id]
-     (map #(update-in % [:event] read-string)
+     (map #(dissoc (merge % (read-string (:event %)))
+                   :event)
           (with-client client (query gameEventTable id {}))))
   ([id clock]
     ; Will return inclusive such as a >= due to UUIDs
-     (map #(update-in % [:event] read-string)
+     (map #(dissoc (merge % (read-string (:event %)))
+                   :event)
           (with-client client (query gameEventTable id
             {:range_condition [:GT (convert-gameClock clock)]}))))
   ([id clockStart clockEnd]
     ; Will return inclusive of the start, exclusive of the end time
-     (map #(update-in % [:event] read-string)
+     (map #(dissoc (merge % (read-string (:event %)))
+                   :event)
           (with-client client (query gameEventTable id {:range_condition
             [:BETWEEN (convert-gameClock clockStart) (convert-gameClock clockEnd)]})))))
