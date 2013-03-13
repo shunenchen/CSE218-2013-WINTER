@@ -87,9 +87,9 @@
   ; penalty is a map that includes penalty type, and all other relevant
   ; information for the penalty
   ; FIXME: hash out with Cam
-  (POST "/events/penalty"              [gameId time playerId penalty]
+  (POST "/events/penalty"              [gameId time playerId penalty type length]
         (friend/authorize #{:official}
-           (api/add-penalty-event gameId (Integer. time) playerId penalty)))
+           (api/add-penalty-event gameId (Integer. time) playerId penalty type (Integer. length))))
 
 
   (GET "/login" request (io/file "resources/login.html"))

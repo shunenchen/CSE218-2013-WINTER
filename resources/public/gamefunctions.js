@@ -247,8 +247,8 @@ function penalty(div){
 function HomePenalty(div, Player, Penalty, Length, Coincidental, Major){
         popup(div);
 
-        Length = document.getElementById(Length).value;
-        Player = document.getElementById(Player).value;
+        Length =  parseInt(document.getElementById(Length).value);
+        Player =  parseInt(document.getElementById(Player).value);
         Penalty = document.getElementById(Penalty).value;
 
         //Determine the type of penalty so we know how to deal with it.
@@ -264,7 +264,7 @@ function HomePenalty(div, Player, Penalty, Length, Coincidental, Major){
         }
 
         //Determine when the penalty will end.
-        var penaltyLength = parseInt(penaltyTime.substring(0,2)) - parseInt(Length);
+        var penaltyLength = parseInt(penaltyTime.substring(0,2)) - Length;
         if (penaltyLength < 0){
                 penaltyLength += 20;
         }
@@ -289,13 +289,20 @@ function HomePenalty(div, Player, Penalty, Length, Coincidental, Major){
                 }
         }
 
-        console.log(Player);              //Who the player was.
-        console.log(Penalty);             //What the penalty was.
-        console.log(penaltyTime);         //The time the penalty was assessed.
-        console.log(Length);              //How long the peanlty is.
-        console.log(penaltyLength);       //When the player will be back on the ice.
-        console.log(Type);                //The Type of penalty.
-
+        // console.log(Player);              //Who the player was.
+        // console.log(Penalty);             //What the penalty was.
+        // console.log(penaltyTime);         //The time the penalty was assessed.
+        // console.log(Length);              //How long the peanlty is.
+        // console.log(penaltyLength);       //When the player will be back on the ice.
+        // console.log(Type);                //The Type of penalty.
+        $.post("/events/penalty", {
+            gameId: GAME_ID,
+            time: timeToStamp(penaltyTime),
+            playerId: lookupPlayer(HOME, Player).id,
+            penalty: Penalty,
+            type: Type,
+            length: Length
+        });
         var player = [Player, penaltyLength, Length];     //Store the player and penalty so that we can block players from being selected.
 
         //Add the penalty to the correct penalty array.
@@ -314,8 +321,8 @@ function HomePenalty(div, Player, Penalty, Length, Coincidental, Major){
 function AwayPenalty(div, Player, Penalty, Length, Coincidental, Major){
         popup(div);
 
-        Length = document.getElementById(Length).value;
-        Player = document.getElementById(Player).value;
+        Length = parseInt(document.getElementById(Length).value);
+        Player = parseInt(document.getElementById(Player).value);
         Penalty = document.getElementById(Penalty).value;
 
         //Determine the type of penalty so we know how to deal with it.
@@ -331,7 +338,7 @@ function AwayPenalty(div, Player, Penalty, Length, Coincidental, Major){
         }
 
         //Determine when the penalty will end.
-        var penaltyLength = parseInt(penaltyTime.substring(0,2)) - parseInt(Length);
+        var penaltyLength = parseInt(penaltyTime.substring(0,2)) - Length;
         if (penaltyLength < 0){
                 penaltyLength += 20;
         }
@@ -356,12 +363,20 @@ function AwayPenalty(div, Player, Penalty, Length, Coincidental, Major){
                 }
         }
 
-        console.log(Player);              //Who the player was.
-        console.log(Penalty);             //What the penalty was.
-        console.log(penaltyTime);         //The time the penalty was assessed.
-        console.log(Length);              //How long the peanlty is.
-        console.log(penaltyLength);       //When the player will be back on the ice.
-        console.log(Type);                //The Type of penalty.
+        // console.log(Player);              //Who the player was.
+        // console.log(Penalty);             //What the penalty was.
+        // console.log(penaltyTime);         //The time the penalty was assessed.
+        // console.log(Length);              //How long the peanlty is.
+        // console.log(penaltyLength);       //When the player will be back on the ice.
+        // console.log(Type);                //The Type of penalty.
+        $.post("/events/penalty", {
+            gameId: GAME_ID,
+            time: timeToStamp(penaltyTime),
+            playerId: lookupPlayer(AWAY, Player).id,
+            penalty: Penalty,
+            type: Type,
+            length: Length
+        });
         var player = [Player, penaltyLength, Length];     //Store the player and penalty so that we can block players from being selected.
 
         //Add the penalty to the correct penalty array.

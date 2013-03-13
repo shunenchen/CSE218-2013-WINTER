@@ -223,5 +223,9 @@
 (defapi add-penalty-event
   "add a penalty for a particular player
   different penalty types will have different additional data"
-  [gameId time playerId penalty]
-  (db/add-game-event gameId time {:type :goal :playerId playerId :penalty penalty}))
+  [gameId time playerId penalty type length]
+  (db/add-game-event gameId time {:type :penalty
+                                  :playerId playerId
+                                  :penalty penalty
+                                  :penaltyType type
+                                  :length length}))
