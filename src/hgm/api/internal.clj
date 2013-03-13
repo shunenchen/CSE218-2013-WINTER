@@ -77,7 +77,13 @@
 
 (defn get-player-stats-internal
   ([player]
-     (db/get-player-career-stats player))
+     (merge {:goals 0
+             :penalties 0
+             :assists 0
+             :time-on-ice 0
+             :shots 0
+             :plus-minus 0}
+            (db/get-player-career-stats player)))
   ([player game]
      (if (not= "finalized" (:status (db/get-game game)))
        (let [events (db/get-game-events game)]
