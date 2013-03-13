@@ -56,6 +56,7 @@
                    :penalty (penalty stats player event)
                    :shot (shot stats player event)
                    :start stats
+                   :end stats
                    ))
                {:on-ice false
                 :goals 0

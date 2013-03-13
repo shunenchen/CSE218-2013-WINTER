@@ -38,9 +38,15 @@ function StartTime(id,srt){
         gameId: GAME_ID,
         startTime: Date.now(),
         home: { teamId: HOME.id,
-                startingPlayers: HOME.players },
+                // these should not be the same!
+                roster: HOME.players,
+                starting: HOME.players
+              },
         away: { teamId: AWAY.id,
-                startingPlayers: AWAY.players }
+                // these should not be the same!
+                roster: AWAY.players,
+                starting: AWAY.players
+              }
     }// , function (data) {
      //    GAME_ID = data.gameId;
      //    console.log('GAME_ID: ' + GAME_ID);
