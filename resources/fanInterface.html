@@ -2,7 +2,7 @@
 <html>
 <head>
 <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
-<script src="https://raw.github.com/dinbror/bpopup/master/jquery.bpopup.min.js"></script>
+<script src="/jquery.simplemodal.1.4.4.min.js"></script>
 <script src="/epochUtils.js"></script>
 <title>Hockey Game Manager</title>
 <meta charset="UTF-8" />
@@ -183,7 +183,7 @@ window.onload=function() {
 	document.getElementById('game-stats').value = "== GAME STATS ==";
 	document.getElementById('home-stats').value = "== HOME STATS ==";
 	document.getElementById('away-stats').value = "== AWAY STATS ==";
-	
+
 	$.getJSON("/games", function(data,status) 	
 	{		
 		target = document.getElementById('selectGame');
@@ -247,6 +247,13 @@ function setupPage(dataToShow) {
 	}
 }
 
+var players_search_id_results = {};
+var players_search_name_results = {};
+var players_search_team_results = {};
+var players_search_num_results = {};
+var players_search_pos_results = {};
+var teams_search_id_results = {};
+
 function search(e)
 {
 	if (null == e)
@@ -260,7 +267,12 @@ function search(e)
 			
 			target.options[0]=new Option("Players search results:");
 			
-			for (var j = 0; j < data["data"].length; j++) { 
+			for (var j = 0; j < data["data"].length; j++) {				
+				players_search_id_results[target.options.length] = data["data"][j]["id"];
+				players_search_name_results[target.options.length] = data["data"][j]["name"];
+				players_search_team_results[target.options.length] = data["data"][j]["teamName"];
+				players_search_num_results[target.options.length] = data["data"][j]["number"];
+				players_search_pos_results[target.options.length] = data["data"][j]["position"];
 				target.options[target.options.length]=new Option(data["data"][j]["name"]);
 			}													
 		});		 
@@ -274,10 +286,59 @@ function search(e)
 			target.options[0]=new Option("Teams search results:");
 			
 			for (var j = 0; j < data["data"].length; j++) { 
-				target.options[target.options.length]=new Option(data["data"][j]["name"]);
+				teams_search_id_results[target.options.length] = data["data"][j]["id"];
+				target.options[target.options.length]=new Option(data["data"][j]["name"]);				
 			}													
 		});	
     }
+}
+
+function playerResultsOverlay()
+{
+	//console.log("plauerResultsOverlay()");
+	
+	var source = document.getElementById('player_search');
+	for(var i=(source.options.length-1); i>=0; i--){
+			if(source.options[i].selected && i != 0){	
+				var name = players_search_name_results[i];
+				var pos = players_search_pos_results[i];
+				var team = players_search_team_results[i];
+				var num = players_search_num_results[i];
+				$.getJSON("/players/"+players_search_id_results[i]+"/stats", function(data,status) 
+				{		
+					var popup_content = "<div><h1>"+name+"</h1>";		
+					popup_content += "Number: " + num;
+					popup_content += "</br>Position: " + pos;	
+					popup_content += "</br>Team: " + team;
+
+				
+					popup_content += "</br></br><h1>== CAREER STATS ==</h1>";
+					popup_content += "Goals:       \t\t" + data["goals"];		
+					popup_content += "</br>Assists:     \t\t" + data["assists"];	
+					popup_content += "</br>Plus Minus:  \t\t" + data["plusMinus"];		
+					popup_content += "</br>Shots:       \t\t" + data["shots"];	
+					popup_content += "</br>Hits:          \t\t" + data["hits"];
+					
+					popup_content += "</div>"	
+					
+					$.modal(popup_content, {overlayClose:true});														
+				});		 
+				
+				source.options[i].selected = false;	
+			}
+	}
+}
+
+function teamResultsOverlay()
+{
+	//console.log("playerResultsOverlay");
+	
+	var source = document.getElementById('team_search');
+	for(var i=(source.options.length-1); i>=0; i--){
+			if(source.options[i].selected){	
+				source.options[i].selected = false;	
+			}
+	}
 }
 
 </script>
@@ -336,10 +397,10 @@ Home Team Stats:
         	</br>         
             
             <div class="search_result_div">             	
-                <select id="player_search" size="4" style="width: 465px; height: 400px; margin-top: 10px; resize: none;">
+                <select id="player_search" onclick="playerResultsOverlay()" size="4" style="width: 465px; height: 400px; margin-top: 10px; resize: none;">
                 <option>Players search results:</option>
                 </select>   
-                <select id="team_search" size="4" style="width: 465px; height: 400px; margin-top: 10px; resize: none;">
+                <select id="team_search" onclick="teamResultsOverlay()" size="4" style="width: 465px; height: 400px; margin-top: 10px; resize: none;">
                 <option>Teams search results:</option>
                 </select>        
             </div>
@@ -349,8 +410,6 @@ Home Team Stats:
 <footer id="main">
   Hockey Game Manager | CSE 218
 </footer>
-
-    <div id="content"></div>
 
 </body>
 </html>

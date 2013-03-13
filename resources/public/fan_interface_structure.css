@@ -1,3 +1,12 @@
+#simplemodal-overlay {
+	background-color: #FFF;
+}
+#simplemodal-container {
+	background-color: #EEE;
+	border: 8px solid #09C;
+	padding: 12px;
+}
+
 body{
   background:#eff3f6;
 }
