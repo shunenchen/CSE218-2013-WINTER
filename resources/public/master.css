@@ -59,7 +59,7 @@ p {
 =POPUPDIVSHOT
 ------------------------------*/
 
-#popUpDivShot {
+.poppable {
 	position:absolute;
 	background-color:#eeeeee;
 	width:350px;
@@ -67,111 +67,34 @@ p {
 	z-index: 9002;
 }
 
-	#popUpDivShot button {
+	.poppable button {
 			width: 35px;
 	}
 	
-		#popUpDivShot input[type=text] {
+		.poppable input[type=text] {
 		width: 70px;
 		vertical-align:bottom;
 		height: 35px;
 		font-size:25px
 	}
 
-		#popUpDivShot input[type=button] {
+		.poppable input[type=button] {
 			width:5em;
 			height:3em;
 			background-color: #A9A9A9;
 		}
-			#popUpDivShot input[type=button].selected {
+			.poppable input[type=button].selected {
 				width:5em;
 				height:3em;
 				background-color: #FFFFFF;
 			}
 
-#popUp {
+.popUp {
 	position:left;
 	padding-left: 40px;
 }			
 	
 
-/*------------------------------
-=POPUPDIVGOAL
-------------------------------*/
-
-#popUpDivGoal {
-	position:absolute;
-	background-color:#eeeeee;
-	width:350px;
-	height:350px;
-	z-index: 9002;
-}
-
-	#popUpDivGoal button {
-			width: 35px;
-	}
-	
-		#popUpDivGoal input[type=text] {
-		width: 70px;
-		vertical-align:bottom;
-		height: 35px;
-		font-size:25px
-	}
-
-		#popUpDivGoal input[type=button] {
-			width:5em;
-			height:3em;
-			background-color: #A9A9A9;
-		}
-			#popUpDivGoal input[type=button].selected {
-				width:5em;
-				height:3em;
-				background-color: #FFFFFF;
-			}
-
-#popUp {
-	position:left;
-	padding-left: 40px;
-}
-
-/*------------------------------
-=POPUPDIVPENALTY
-------------------------------*/
-
-#popUpDivPenalty {
-	position:absolute;
-	background-color:#eeeeee;
-	width:350px;
-	height:350px;
-	z-index: 9002;
-}
-
-	#popUpDivPenalty button {
-			width: 35px;
-	}
-	
-		#popUpDivPenalty input[type=text] {
-		width: 70px;
-		vertical-align:bottom;
-		height: 35px;
-		font-size:25px
-	}
-
-		#popUpDivPenalty input[type=button] {
-			width:5em;
-			height:3em;
-			background-color: #A9A9A9;
-		}
-			#popUpDivPenalty input[type=button].selected {
-				width:5em;
-				height:3em;
-				background-color: #FFFFFF;
-			}
-
-#popUp {
-	position:left;
-	padding-left: 40px;
-}
 
 /*------------------------------
 =CONTENT AREA

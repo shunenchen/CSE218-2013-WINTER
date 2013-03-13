@@ -27,10 +27,71 @@ function Queue(){
         };
 };
 
+function getTeamName(teamId) {
+	var teamName = "undefined";
+	$.ajax({
+		type: 'GET',
+		url: "/teams/"+teamId,
+		dataType: 'json',
+		success: function(data) {teamName = data["name"];},
+		async: false
+	});	
+	team_names[teamId] = teamName;
+	return teamName;
+}
+
 var GAME_ID = "0001366936200-4532f8ad-e638-43a3-8de7-b8d4f4b7845b@46b24778-e521-4c76-b714-1c61450242ec";
 
 var HOME = { id: "46b24778-e521-4c76-b714-1c61450242ec" };
 var AWAY = { id: "4532f8ad-e638-43a3-8de7-b8d4f4b7845b" };
+
+var game_ids = {};
+var team_names = {};
+
+
+$(document).ready(function() {
+    console.log('hello');
+    popup('popUpDivSelect');
+            
+    
+    $.getJSON("/games", function(data,status) 	
+	{		
+		target = document.getElementById('selectGame');
+   				
+		for (var i = 0; i < data["data"].length; i++) { 
+			var dom_txt = getTeamName(data["data"][i]["awayTeam"]) + " @ " + getTeamName(data["data"][i]["homeTeam"]) + " (" + EpochToDate(data["data"][i]["startTime"]) + ")";
+			game_ids[dom_txt] = data["data"][i]["id"];
+			target.options[target.options.length]=new Option(dom_txt);
+		}      
+    });	
+    
+    $("#chooseGame").submit(function() {
+          var game = $("#selectGame").val();
+          console.log(game);
+          GAME_ID = game_ids[game];
+          console.log(GAME_ID);
+          var awayStart = GAME_ID.indexOf('-') + 1;
+          var awayEnd = GAME_ID.indexOf('@');
+          var homeStart = awayEnd + 1;
+          AWAY.id = GAME_ID.substring(awayStart, awayEnd);
+          HOME.id = GAME_ID.substring(homeStart);
+          
+          console.log(AWAY.id);
+          console.log(HOME.id);
+          
+          popup('popUpDivSelect');
+
+          //$.post("/games", {home: homeId, away: awayId, startTime:
+//                              ts}, "json").fail(function (e) { console.log(e); });
+
+          return false;
+        });
+        });
+
+
+
+
+      
 
 //Game Timer Functions
 function StartTime(id,srt){

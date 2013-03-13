@@ -7,6 +7,7 @@
 <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
 <script type="text/javascript" src="popup.js"></script>
 <script type="text/javascript" src="gamefunctions.js"></script>
+<script src="/epochUtils.js"></script>
 <script type="text/javascript">
 //Test JS code here because I am lazy.
 </script>
@@ -14,18 +15,29 @@
 </head>
 <body>
 <div id="blanket" style="display:none;"></div>
-<div id="popUpDivShot" style="display:none;">
+<div id="popUpDivShot" class="poppable" style="display:none;">
 	<h3> Enter the player's number and press the appropriate team. </h3>
-	<div id="popUp">
+	<div class="popUp">
 		<input type="button" value="Home" onclick="HomeShot('popUpDivShot','logShot');">
 		<input id="logShot" type="text" value="" maxlength="2">
 		<input type="button" value="Away" onclick="AwayShot('popUpDivShot','logShot');">
 		<br><input type="button" value="Cancel" onclick="popup('popUpDivShot');">
 	</div>
 </div>
-<div id="popUpDivGoal" style="display:none;">
+<div id="popUpDivSelect" class="poppable" style="display:none;">
+	<h3> Choose which game you want to edit. </h3>
+	<div class="popUp">
+		<form id="chooseGame">
+      <select name="selectGame" id="selectGame">
+      </select>
+      <input type="submit" value="Choose!">
+    </form>
+	</div>
+</div>
+
+<div id="popUpDivGoal" class="poppable" style="display:none;">
 	<h3> Enter the scoring info and press the approriate team. </h3>
-	<div id="popUp">
+	<div class="popUp">
 		<input type="button" value="Home" onclick="HomeGoal('popUpDivGoal','Scorer','Assist1','Assist2');">
 		<input type="button" value="Away" onclick="AwayGoal('popUpDivGoal','Scorer','Assist1','Assist2');">
 		<input type="button" value="Cancel" onclick="popup('popUpDivGoal');">
@@ -36,9 +48,9 @@
 
 	</div>
 </div>	
-<div id="popUpDivPenalty" style="display:none;">
+<div id="popUpDivPenalty" class="poppable" style="display:none;">
 	<h3> Enter the penalty info and press the appropriate team. </h3>
-	<div id="popUp">
+	<div class="popUp">
 		<input type="button" value="Home" onclick="HomePenalty('popUpDivPenalty','Player','Penalty','Length','Coincidental','Major');"> 
 		<input type="button" value="Away" onclick="AwayPenalty('popUpDivPenalty','Player','Penalty','Length','Coincidental','Major');">
 		<input type="button" value="Cancel" onclick="popup('popUpDivPenalty');">
