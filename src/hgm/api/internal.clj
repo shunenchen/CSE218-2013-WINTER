@@ -8,6 +8,12 @@
     (update-in stats [:goals] inc)
     stats))
 
+(defn update-assist-stats
+  [stats player event]
+  (if (.contains (:assists event) (:id player))
+    (update-in stats [:assists] inc)
+    stats))
+
 (defn update-plus-minus-stats
   [stats player event]
   (if (:on-ice stats)
@@ -50,7 +56,8 @@
                  (case (:type event)
                    :goal (-> stats
                              (update-goal-stats player event)
-                             (update-plus-minus-stats player event))
+                             (update-plus-minus-stats player event)
+                             (update-assist-stats player event))
                    :enter-ice (enter-ice stats player event)
                    :exit-ice (exit-ice stats player event)
                    :penalty (penalty stats player event)
@@ -60,6 +67,7 @@
                    ))
                {:on-ice false
                 :goals 0
+                :assists 0
                 :penalties 0
                 :plus-minus 0
                 :shots 0

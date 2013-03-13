@@ -22,6 +22,7 @@ var players_ids = {};
 var team_names = {};
 var currently_showing = DataToShow.SHOW_GAME_EVENTS;
 
+var uuid_to_player = {};
 
 $(document).ready(function() {
   	$("#show-event").click(function() {
@@ -29,65 +30,7 @@ $(document).ready(function() {
 		
 		for(var i=(source.options.length-1); i>=0; i--){
 			if(source.options[i].selected){		
-				$.getJSON("/games/"+games_ids[source.options[i].text]+"/events", function(data,status) 
-				{		
-					target = document.getElementById('event-box');
-					if (data["events"].length == 0)
-						target.value = "NO EVENTS RECORDED";
-					else 
-					{
-						target.value = "";
-						for (var i = 0; i < data["events"].length; i++) { 
-							if (data["events"][i]["game_clock"] != undefined) {
-								var time = MillisecToMinSec(data["events"][i]["game_clock"]);
-								var str =  time["mins"] + ":" + time["secs"];
-								while(str.length < 7) str+=" ";
-								target.value += str + " \t\t\t";
-							}
-							else
-								target.value += "??:??" + "\t\t\t";
-							
-							var team_str = "";
-							if (data["events"][i]["teamId"])
-								team_str = "(" + team_names[data["events"][i]["teamId"]] + ")";
-							
-							while (team_str.length < 30) team_str+=" ";
-							target.value += team_str+"\t\t\t";
-							
-							if ("ENTER ICE" === data["events"][i]["type"])
-								target.value += data["events"][i]["playerName"] + " Enters Ice\t";
-							else if ("EXIT ICE" === data["events"][i]["type"])
-								target.value += data["events"][i]["playerName"] + " Exits Ice\t";	
-							else if ("FACEOFF_WON" === data["events"][i]["type"])
-								target.value += data["events"][i]["playerName"] + " Wins Faceoff\t";	
-							else if ("FACEOFF_LOST" === data["events"][i]["type"])
-								target.value += data["events"][i]["playerName"] + " Loses Faceoff\t";	
-							else if ("SHOT" === data["events"][i]["type"])
-								target.value += data["events"][i]["info"] + "\t";	
-							else if ("PENALTY" === data["events"][i]["type"])
-								target.value += data["events"][i]["info"] + "\t";	
-							else if ("HIT" === data["events"][i]["type"])
-								target.value += data["events"][i]["info"] + "\t";
-							else if ("ASSIST" === data["events"][i]["type"])
-								target.value += data["events"][i]["info"] + "\t";
-							else if ("GOAL" === data["events"][i]["type"])
-								target.value += "GOAL! - " + data["events"][i]["info"] + "\t";
-							else if ("SAVE" === data["events"][i]["type"])
-								target.value += data["events"][i]["playerName"] + " Gets a Save\t";		
-							else if ("Game Start" === data["events"][i]["type"])
-								target.value += "\tStart of Game\t";	
-							else if ("Game End" === data["events"][i]["type"])
-								target.value += "\tEnd of Game\t";	
-							else if ("Period Start" === data["events"][i]["type"])
-								target.value += "\tStart of Period\t";	
-							else if ("Period End" === data["events"][i]["type"])
-								target.value += "\tEnd of Period\t";	
-							
-							target.value += "\n";
-						}
-					}	
-				});	
-				
+                                var homeD = $.Deferred(), awayD = $.Deferred();
 				$.getJSON("/games/"+games_ids[source.options[i].text], function(data,status) 
 				{		
 					target = document.getElementById('selectPlayer');
@@ -108,9 +51,10 @@ $(document).ready(function() {
 							var num = data["data"][i]["number"];
 							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
 							players_ids[target.options.length] = data["data"][i]["id"];
+                                                        uuid_to_player[data.data[i].id] = str;
 							target.options[target.options.length]=new Option(str);
 						}
-																
+						awayD.resolve();										
 					});		 						
 						
 					var home_id = data["homeTeam"]; 
@@ -125,12 +69,75 @@ $(document).ready(function() {
 							var num = data["data"][i]["number"];
 							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
 							players_ids[target.options.length] = data["data"][i]["id"];	
+                                                        uuid_to_player[data.data[i].id] = str;
 							//console.log(players_ids[target.options.length]);
 							target.options[target.options.length]=new Option(str);							
 						}
-																
+                                                homeD.resolve();
 					});		 													
 				});		  	
+
+				$.getJSON("/games/"+games_ids[source.options[i].text]+"/events", function(data,status) 
+				{		
+                                    $.when(homeD, awayD).then(function() {
+					target = document.getElementById('event-box');
+					if (data["events"].length == 0)
+						target.value = "NO EVENTS RECORDED";
+					else 
+					{
+						target.value = "";
+						for (var i = 0; i < data["events"].length; i++) { 
+							if (data["events"][i]["time"] != undefined) {
+								var time = MillisecToMinSec(data["events"][i]["time"]);
+								var str =  time["mins"] + ":" + time["secs"];
+								while(str.length < 7) str+=" ";
+								target.value += str + " \t\t\t";
+							}
+							else
+								target.value += "??:??" + "\t\t\t";
+							
+							var team_str = "";
+							if (data["events"][i]["teamId"])
+								team_str = "(" + team_names[data["events"][i]["teamId"]] + ")";
+							
+							while (team_str.length < 30) team_str+=" ";
+							target.value += team_str+"\t\t\t";
+							
+							if ("enter-ice" === data["events"][i]["type"])
+								target.value += uuid_to_player[data.events[i].playerId] + " Enters Ice\t";
+							else if ("exit-ice" === data["events"][i]["type"])
+								target.value += uuid_to_player[data.events[i].playerId] + " Exits Ice\t";	
+							//else if ("FACEOFF_WON" === data["events"][i]["type"])
+							//	target.value += uuid_to_player[data.events[i].playerId] + " Wins Faceoff\t";	
+							//else if ("FACEOFF_LOST" === data["events"][i]["type"])
+							//	target.value += uuid_to_player[data.events[i].playerId] + " Loses Faceoff\t";	
+							else if ("shot" === data["events"][i]["type"])
+								target.value += "Shot by " + uuid_to_player[data["events"][i]["playerId"]] + "\t";	
+							else if ("penalty" === data["events"][i]["type"])
+								target.value += data["events"][i]["penalty"] + "\t";	
+							//else if ("HIT" === data["events"][i]["type"])
+							//	target.value += data["events"][i]["info"] + "\t";
+							//else if ("ASSIST" === data["events"][i]["type"])
+							//	target.value += data["events"][i]["info"] + "\t";
+							else if ("goal" === data["events"][i]["type"])
+								target.value += "GOAL! - " + uuid_to_player[data["events"][i]["playerId"]] + "\t";
+							//else if ("SAVE" === data["events"][i]["type"])
+							//	target.value += uuid_to_player[data.events[i].playerId] + " Gets a Save\t";		
+							else if ("start" === data["events"][i]["type"])
+								target.value += "\tStart of Game\t";	
+							else if ("end" === data["events"][i]["type"])
+								target.value += "\tEnd of Game\t";	
+							//else if ("Period Start" === data["events"][i]["type"])
+							//	target.value += "\tStart of Period\t";	
+							//else if ("Period End" === data["events"][i]["type"])
+							//	target.value += "\tEnd of Period\t";	
+							
+							target.value += "\n";
+						}
+					}	
+                                    });
+				});	
+				
 			}	
 		}
   	});
@@ -145,9 +152,9 @@ $(document).ready(function() {
 					target.value = "== CAREER STATS ==\n";
 					target.value += "Goals:       \t\t" + data["goals"] + "\n";		
 					target.value += "Assists:     \t\t" + data["assists"] + "\n";	
-					target.value += "Plus Minus:  \t\t" + data["plusMinus"] + "\n";		
+					target.value += "Plus Minus:  \t\t" + data["plus-minus"] + "\n";		
 					target.value += "Shots:       \t\t" + data["shots"] + "\n";		
-					target.value += "Hits:          \t\t" + data["hits"] + "\n";																	
+					//target.value += "Hits:          \t\t" + data["hits"] + "\n";																	
 				});		 
 				
 				var select_game = document.getElementById('selectGame');
@@ -157,12 +164,13 @@ $(document).ready(function() {
 						$.getJSON("/players/"+players_ids[i]+"/stats/for-game/"+games_ids[select_game.options[j].text], function(data,status) 
 						{			
 							var target = document.getElementById('game-stats');				
+                                                        console.log(data);
 							target.value = "== GAME STATS ==\n";
 							target.value += "Goals:       \t\t" + data["goals"] + "\n";		
 							target.value += "Assists:     \t\t" + data["assists"] + "\n";	
-							target.value += "Plus Minus:  \t\t" + data["plusMinus"] + "\n";		
+							target.value += "Plus Minus:  \t\t" + data["plus-minus"] + "\n";		
 							target.value += "Shots:       \t\t" + data["shots"] + "\n";		
-							target.value += "Hits:          \t\t" + data["hits"] + "\n";																	
+							//target.value += "Hits:          \t\t" + data["hits"] + "\n";																	
 						});		 		
 					}
 				}
