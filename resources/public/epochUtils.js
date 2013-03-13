@@ -3,8 +3,8 @@ function EpochToDate(epoch) {
     return date.toLocaleDateString();
 }
 
-function MillisecToMinSec(ms) {
-	var x = ms / 1000;
+function MillisecToMinSec(sec) {
+	var x = sec;
 	var seconds = x % 60;
 	x /= 60
 	var minutes = x % 60;
