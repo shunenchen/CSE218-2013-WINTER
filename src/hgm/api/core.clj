@@ -122,62 +122,27 @@
   [gameId]
   {:events (db/get-game-events gameId)})
 
-;; (defapi get-game-stats
-;;   "Get the stats for a specific game."
-;;   [gameId]
-;;   (if-let [summary (:summary (db/get-game gameId))]
-;;     (assoc summary :done true)
-;;     (let [summary (summarize-game (db/get-game-events gameId))]
-;;       (assoc summary :done false))))
-
 (defapi get-game-stats
   "Get the stats for a specific game."
   [gameId]
-  {:startTime 500
-   :home "4532f8ad-e638-43a3-8de7-b8d4f4b7845b"
-   :away "46b24778-e521-4c76-b714-1c61450242ec"
-   :goals [{:teamId "46b24778-e521-4c76-b714-1c61450242ec"
-            :playerId "0dd8b326-ddf5-48cc-927d-9c361a0c5691"
-            :type :goal
-            :time 100}]
-   :penalties []
-   :done true})
-
-;; (defapi get-player-career-stats
-;;   "Get a list of all stats for this player
-;;   stats currently supported
-;;     * plus-minus"
-;;   [playerId]
-;;   (get-player-stats-internal playerId))
+  (if-let [summary (:summary (db/get-game gameId))]
+    (assoc summary :done true)
+    (let [summary (summarize-game (db/get-game-events gameId))]
+      (assoc summary :done false))))
 
 (defapi get-player-career-stats
   "Get a list of all stats for this player
   stats currently supported
     * plus-minus"
   [playerId]
-  {:goals 2
-   :assists 5
-   :plusMinus -3
-   :shots 7
-   :hits 10})
-
-;; (defapi get-player-game-stats
-;;   "Get a list of all stats for this player
-;;   stats currently supported
-;;     * plus-minus"
-;;   [playerId gameId]
-;;   (get-player-stats-internal playerId gameId))
+  (get-player-stats-internal playerId))
 
 (defapi get-player-game-stats
   "Get a list of all stats for this player
   stats currently supported
     * plus-minus"
   [playerId gameId]
-  {:goals 2
-   :assists 5
-   :plusMinus -3
-   :shots 7
-   :hits 10})
+  (get-player-stats-internal playerId gameId))
 
 ;; the add-X-event functions are stubs and do not reflect an actual api...
 (defapi add-start-game-event
