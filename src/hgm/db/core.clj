@@ -44,7 +44,8 @@
 (defn get-user
   "Returns the first user with the given google id, or nil if one doesn't exist."
   [id]
-    (read-string (:info (with-client client (get-item userTable (create-key id))))))
+  (when-let [r (with-client client (get-item userTable (create-key id)))]
+    (read-string (:info r))))
 
 (defn create-user
   "m is a map with an :identity key. Returns the user."
