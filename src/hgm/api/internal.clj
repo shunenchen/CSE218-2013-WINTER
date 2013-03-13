@@ -31,6 +31,18 @@
                  :last-entered (:time event))
     stats))
 
+(defn penalty
+  [stats player event]
+  (if (= (:playerId event) (:id player))
+    (update-in stats [:penalties] inc)
+    stats))
+
+(defn shot
+  [stats player event]
+  (if (= (:playerId event) (:id player))
+    (update-in stats [:shots] inc)
+    stats))
+
 (defn compute-player-stats
   [player events]
   (let [stats (reduce
@@ -41,10 +53,15 @@
                              (update-plus-minus-stats player event))
                    :enter-ice (enter-ice stats player event)
                    :exit-ice (exit-ice stats player event)
+                   :penalty (penalty stats player event)
+                   :shot (shot stats player event)
+                   :start stats
                    ))
                {:on-ice false
                 :goals 0
+                :penalties 0
                 :plus-minus 0
+                :shots 0
                 :time-on-ice 0}
                events)]
     (dissoc stats :on-ice :last-entered)))
