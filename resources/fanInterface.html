@@ -12,7 +12,7 @@
 var DataToShow = { 
 	SHOW_GAME_EVENTS	: 0, 
 	SHOW_PLAYER_STATS	: 1, 
-	SHOW_TEAMS_INFO		: 2 
+	SHOW_TEAMS_STATS		: 2 
 	};
 
 var games_ids = {};
@@ -123,7 +123,7 @@ $(document).ready(function() {
 							var num = data["data"][i]["number"];
 							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
 							players_ids[target.options.length] = data["data"][i]["id"];	
-							console.log(players_ids[target.options.length]);
+							//console.log(players_ids[target.options.length]);
 							target.options[target.options.length]=new Option(str);							
 						}
 																
@@ -179,6 +179,8 @@ window.onload=function() {
 	document.getElementById('event-box').value = "";	
 	document.getElementById('career-stats').value = "== CAREER STATS ==";
 	document.getElementById('game-stats').value = "== GAME STATS ==";
+	document.getElementById('home-stats').value = "== HOME STATS ==";
+	document.getElementById('away-stats').value = "== AWAY STATS ==";
 	
 	$.getJSON("/games", function(data,status) 	
 	{		
@@ -211,23 +213,23 @@ function setupPage(dataToShow) {
 	{
 		showing_game_events = true;
 		$('.player_events_div').hide();
-		$('.teams_info_div').hide();
-		$('.game_events_div').show();
+		$('.teams_stats_div').hide();
+		$('.game_stats_div').show();
 		currently_showing = DataToShow.SHOW_GAME_EVENTS;
 	}
 	else if (dataToShow === DataToShow.SHOW_PLAYER_STATS && currently_showing !== DataToShow.SHOW_PLAYER_STATS)
 	{
-		$('.game_events_div').hide();
-		$('.teams_info_div').hide();
+		$('.game_stats_div').hide();
+		$('.teams_stats_div').hide();
 		$('.player_events_div').show();
 		currently_showing = DataToShow.SHOW_PLAYER_STATS;
 	}
-	else if (dataToShow === DataToShow.SHOW_TEAMS_INFO && currently_showing !== DataToShow.SHOW_TEAMS_INFO)
+	else if (dataToShow === DataToShow.SHOW_TEAMS_STATS && currently_showing !== DataToShow.SHOW_TEAMS_STATS)
 	{
-		$('.game_events_div').hide();
-		$('.teams_info_div').show();
+		$('.game_stats_div').hide();
+		$('.teams_stats_div').show();
 		$('.player_events_div').hide();		
-		currently_showing = DataToShow.SHOW_TEAMS_INFO;
+		currently_showing = DataToShow.SHOW_TEAMS_STATS;
 	}
 }
 
@@ -247,9 +249,9 @@ function setupPage(dataToShow) {
             </select></td>
             <button type="submit" id="show-event" class="btn" style="visibility: visible">Update</button>
         	</br> 
-            <a onClick=setupPage(DataToShow.SHOW_GAME_EVENTS)>Game Events</a>  |  <a onClick=setupPage(DataToShow.SHOW_PLAYER_STATS)>Player Events</a>  |  <a onClick=setupPage(DataToShow.SHOW_TEAMS_INFO)>Teams Info</a>
+            <a onClick=setupPage(DataToShow.SHOW_GAME_EVENTS)>Game Events</a>  |  <a onClick=setupPage(DataToShow.SHOW_PLAYER_STATS)>Player Stats</a>  |  <a onClick=setupPage(DataToShow.SHOW_TEAMS_STATS)>Teams Stats</a>
             
-            <div class="game_events_div">
+            <div class="game_stats_div">
                 <textarea readonly id="event-box" rows="4" style="width: 940px; height: 440px; margin-top: 10px; resize: none;">
                 </textarea>          
             </div>
@@ -267,12 +269,12 @@ Career Stats:
                 </textarea>        
             </div>
             
-            <div class="teams_info_div">             	
-                <textarea readonly id="game-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
-Away Team Info:
+            <div class="teams_stats_div">             	
+                <textarea readonly id="away-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
+Away Team Stats:
                 </textarea>   
-                <textarea readonly id="career-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
-Home Team Info:
+                <textarea readonly id="home-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
+Home Team Stats:
                 </textarea>        
             </div>
 	</content>
