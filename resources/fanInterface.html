@@ -45,13 +45,15 @@ $(document).ready(function() {
 						target.options[target.options.length]=new Option("=="+team_names[away_id]+"==");
 						
 						for (var i = 0; i < data["data"].length; i++) { 
-							var name = data["data"][i]["name"];
-							while (name < 30) name += " ";
-							var pos = data["data"][i]["position"];
-							var num = data["data"][i]["number"];
-							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
+							var name = data["data"][i]["name"];							
+							//while (name.length < 40) name += " ";
+							var pos = "("+data["data"][i]["position"]+")";
+							//while (pos.length < 20) pos += " ";
+							var num = "#"+data["data"][i]["number"];
+							//while (num.length < 10) num += " ";
+							var str = num + "\t" + name + " | " +pos;
 							players_ids[target.options.length] = data["data"][i]["id"];
-                                                        uuid_to_player[data.data[i].id] = str;
+                            uuid_to_player[data.data[i].id] = str;
 							target.options[target.options.length]=new Option(str);
 						}
 						awayD.resolve();										
@@ -64,10 +66,12 @@ $(document).ready(function() {
 						
 						for (var i = 0; i < data["data"].length; i++) { 
 							var name = data["data"][i]["name"];
-							while (name < 30) name += " ";
-							var pos = data["data"][i]["position"];
-							var num = data["data"][i]["number"];
-							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
+							//while (name.length < 40) name += " ";
+							var pos = "("+data["data"][i]["position"]+")";
+							//while (pos.length < 20) pos += " ";
+							var num = "#"+data["data"][i]["number"];
+							//while (num.length < 10) num += " ";
+							var str = num + "\t" + name + " | " +pos;
 							players_ids[target.options.length] = data["data"][i]["id"];	
                                                         uuid_to_player[data.data[i].id] = str;
 							//console.log(players_ids[target.options.length]);
