@@ -31,7 +31,7 @@
   "True if s contains the substring."
   [substring ^String s]
   (.contains s substring))
-  
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Users
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -126,17 +126,17 @@
 (defn search-players
   "Returns all player objects with the partial name."
   [pn]
-    (if (not= pn "")   
-	(filter #(substring? (clojure.string/lower-case pn) (clojure.string/lower-case (:name %)))
-	(map #(read-string (:info %))
-	(filter #(not= (:info %) " ")	
-	(with-client client (scan playerTable {:attributes_to_get ["info"]})))))))
-	
+    (if (not= pn "")
+        (filter #(substring? (clojure.string/lower-case pn) (clojure.string/lower-case (:name %)))
+        (map #(read-string (:info %))
+        (filter #(not= (:info %) " ")
+        (with-client client (scan playerTable {:attributes_to_get ["info"]})))))))
+
 (defn get-roster
   "Returns the player objects associated with the given team."
   [id]
     (map #(read-string (:info %)) (with-client client (query teamPlayerTable id {}))))
-    
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Teams
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -157,7 +157,7 @@
   []
     (map #(read-string (:info %)) (filter #(= (:data %) "INFO")
       (with-client client (scan teamTable {:attributes_to_get ["data" "info"]})))))
-      
+
 (defn get-team-info
   "Returns info via a team object."
   [id]
@@ -177,10 +177,10 @@
   "Returns all team info objects with the partial name."
   [pn]
    (filter #(substring? (clojure.string/lower-case pn) (clojure.string/lower-case (:name %)))
-	(map #(read-string (:info %))
-	(filter #(not= (:info %) nil)	
-	(with-client client (scan teamTable {:attributes_to_get ["info"]}))))))
-	
+        (map #(read-string (:info %))
+        (filter #(not= (:info %) nil)
+        (with-client client (scan teamTable {:attributes_to_get ["info"]}))))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Games
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -209,7 +209,7 @@
            hGames (read-string (:games (with-client client (get-item teamTable (create-key hid "GAMES")))))]
         (with-client client
           (update-item teamTable (create-key aid "GAMES") {:games (str (conj aGames gid))})
-          (update-item teamTable (create-key hid "GAMES") {:games (str (conj hGames gid))})     
+          (update-item teamTable (create-key hid "GAMES") {:games (str (conj hGames gid))})
      g))))
 
 (defn get-game
@@ -223,15 +223,14 @@
   "Returns ids for all created games."
    []
     (map :id (with-client client (scan gameTable {:attributes_to_get ["id"]}))))
-    
+
 (defn get-games
   "Returns all game objects."
   []
     (map #(read-string (:info %)) (with-client client (scan gameTable {:attributes_to_get ["info"]}))))
 
 (defn update-game
-  "Game should be a map with an :id key."
-  [game]
+  "Game should be a map with an :id key."  [game]
     (with-client client (update-item gameTable (create-key (:id game)) {:info (str game)})))
 
 (defn set-game-summary
@@ -244,7 +243,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Stats
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
+
 (defn set-player-game-stats
   "Sets the stats for the specified player-game."
   [playerId gameId stats]
@@ -298,7 +297,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Game Events
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
+
 (defn convert-gameClock
   [gameClock]
   (format "%07d" gameClock))

@@ -21,15 +21,17 @@
   (GET  "/"      [] (io/file "resources/fanInterface.html"))
   (GET  "/admin" [] (friend/authorize #{:official} (io/file "resources/controlPanel.html")))
   (GET  "/game"  [] (friend/authorize #{:official} (io/file "resources/hockey.html")))
+  (GET  "/games/new" [] (friend/authorize #{:official} (io/file "resources/game.html")))
 
   ;; team
   (GET  "/teams/:team"            [team] (api/get-team team))
 
 
   ;; searches
+  (GET  "/teams"                  [] (api/search-teams ""))
   (GET  "/search/teams/:name"     [name] (api/search-teams name))
   (GET  "/search/players/:name"     [name] (api/search-players name))
-  
+
 
   ;; roster
   (GET  "/teams/:team/get-forwards" [team] (api/get-forwards team))
@@ -46,7 +48,7 @@
   (GET  "/games"                    [] (api/get-games))
   (POST "/games"                    [startTime home away]
         (friend/authorize #{:official}
-           (api/create-game startTime home away)))
+           (api/create-game (Integer. startTime) home away)))
   (GET  "/games/:gameId"            [gameId] (api/get-game gameId))
   (GET  "/games/:gameId/stats"      [gameId] (api/get-game-stats gameId))
   (GET  "/games/:gameId/events"     [gameId] (api/get-events gameId))
@@ -63,31 +65,31 @@
 
   (POST "/events/start-game"        [gameId startTime home away]
         (friend/authorize #{:official}
-           (api/add-start-game-event gameId startTime home away)))
+           (api/add-start-game-event gameId (Integer. startTime) home away)))
 
   (POST "/events/swap-players"      [gameId time outPlayer inPlayer]
         (friend/authorize #{:official}
-           (api/add-swap-players-event gameId time outPlayer inPlayer)))
+           (api/add-swap-players-event gameId (Integer. time) outPlayer inPlayer)))
 
   (POST "/events/end-game"          [gameId time]
         (friend/authorize #{:official}
-           (api/add-end-game-event gameId time)))
+           (api/add-end-game-event gameId (Integer. time))))
 
   (POST "/events/shot"              [gameId time playerId]
         (friend/authorize #{:official}
-           (api/add-shot-event gameId time playerId)))
+           (api/add-shot-event gameId (Integer. time) playerId)))
 
   ; assists is a list of up to two player ids
   (POST "/events/goal"              [gameId time playerId assists]
         (friend/authorize #{:official}
-           (api/add-goal-event gameId time playerId assists)))
+           (api/add-goal-event gameId (Integer. time) playerId assists)))
 
   ; penalty is a map that includes penalty type, and all other relevant
   ; information for the penalty
   ; FIXME: hash out with Cam
   (POST "/events/penalty"              [gameId time playerId penalty]
         (friend/authorize #{:official}
-           (api/add-penalty-event gameId time playerId penalty)))
+           (api/add-penalty-event gameId (Integer. time) playerId penalty)))
 
 
   (GET "/login" request (io/file "resources/login.html"))

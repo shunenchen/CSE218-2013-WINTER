@@ -17,7 +17,10 @@
                        ~@body)]
             {:status 200
              :body (if (map? r#) r# {:data r#})})
-          (catch java.lang.Throwable t# {:status 500 :body (.getMessage t#)}))))
+          (catch java.lang.Throwable t#
+            (do (println (.getMessage t#))
+                (.printStackTrace t#)
+                {:status 500 :body (.getMessage t#)})))))
 
 ;;;; Players
 
@@ -43,7 +46,7 @@
 
 
 ;;;;; Searches
-  
+
 (defapi search-teams
   "Get all teams that contain the substring `name'."
   [name]
@@ -84,6 +87,7 @@
 (defapi create-game
   "Create a game between `home' and `away', starting at `startTime'."
   [startTime home away]
+  (println (type startTime))
   (db/create-game {:startTime startTime :homeTeam home
       :awayTeam away :status "scheduled"}))
 
@@ -110,7 +114,7 @@
                        stats
                        {:game-ids gameId})))
       (db/set-game-summary gameId (summarize-game (cons start events))))
-    (db/update-game gameId
+    (db/update-game
      (assoc-in (db/get-game gameId) [:status] "finalized"))))
 
 (defapi get-events
@@ -186,7 +190,7 @@
                                      :time startTime
                                      :home (:roster home)
                                      :away (:roster away)})
-        (db/update-game gameId 
+        (db/update-game
           (assoc-in (db/get-game gameId) [:status] "started"))
         (doseq [p (concat (:starting home) (:starting away))]
           (db/add-game-event gameId 0 {:type :enter-ice :playerId p})))))
@@ -203,7 +207,7 @@
   "End a game."
   [gameId time]
   (do (db/add-game-event gameId time {:type :end})
-      (db/update-game gameId 
+      (db/update-game
         (assoc-in (db/get-game gameId) [:status] "ended"))))
 
 (defapi add-shot-event

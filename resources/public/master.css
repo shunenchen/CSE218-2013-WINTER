@@ -19,7 +19,7 @@ header, footer, section, aside, nav, article {
 body {
 	margin: 0 auto;
 	padding: 22px 0;
-	width: 550px;
+	width: 650px;
 	font: 13px/22px Helvetica, Arial, sans-serif;
 	background: #F0F0F0;
 }
@@ -42,7 +42,7 @@ p {
 }
 
 /*------------------------------
-=POPUPDIV
+=BLANKET
 ------------------------------*/
 
 #blanket {
@@ -54,31 +54,36 @@ p {
    left:0px;
    width:100%;
 }
-#popUpDiv {
+
+/*------------------------------
+=POPUPDIVSHOT
+------------------------------*/
+
+#popUpDivShot {
 	position:absolute;
 	background-color:#eeeeee;
-	width:300px;
-	height:300px;
+	width:350px;
+	height:350px;
 	z-index: 9002;
 }
 
-	#popUpDiv button {
+	#popUpDivShot button {
 			width: 35px;
 	}
 	
-		#popUpDiv input[type=text] {
+		#popUpDivShot input[type=text] {
 		width: 70px;
 		vertical-align:bottom;
 		height: 35px;
 		font-size:25px
 	}
 
-		#popUpDiv input[type=button] {
+		#popUpDivShot input[type=button] {
 			width:5em;
 			height:3em;
 			background-color: #A9A9A9;
 		}
-			#popUpDiv input[type=button].selected {
+			#popUpDivShot input[type=button].selected {
 				width:5em;
 				height:3em;
 				background-color: #FFFFFF;
@@ -90,56 +95,86 @@ p {
 }			
 	
 
-
 /*------------------------------
-=NAVIGATION
+=POPUPDIVGOAL
 ------------------------------*/
 
-nav {
-	position: absolute;
-	left: 0;
-	width: 100%;
-	background: #222222;
+#popUpDivGoal {
+	position:absolute;
+	background-color:#eeeeee;
+	width:350px;
+	height:350px;
+	z-index: 9002;
 }
-	nav div {
-		display: table;
-		margin: 0 auto;
-		padding: 44px 0;
-		width: 500px;
-		color: #777;
+
+	#popUpDivGoal button {
+			width: 35px;
+	}
+	
+		#popUpDivGoal input[type=text] {
+		width: 70px;
+		vertical-align:bottom;
+		height: 35px;
+		font-size:25px
 	}
 
-	nav ul {
-		margin: 0 auto;
-		width: 500px;
-		list-style: none;
-	}
-
-		nav ul li {
-			float: left;
+		#popUpDivGoal input[type=button] {
+			width:5em;
+			height:3em;
+			background-color: #A9A9A9;
 		}
-		
-			nav ul li a {
-				display: block;
-				width: 216px;
-				font-size: 14px;
-				line-height: 44px;
-				text-align: center;
-				text-decoration: none;
-				color: #777;
-			}
-			
-				nav ul li a:hover {
-	color: #fff;
-				}
-			
-			nav ul li.selected a {
-				color: #fff;
+			#popUpDivGoal input[type=button].selected {
+				width:5em;
+				height:3em;
+				background-color: #FFFFFF;
 			}
 
+#popUp {
+	position:left;
+	padding-left: 40px;
+}
 
 /*------------------------------
-=CONTENT AREA AND SIDEBAR LAYOUT
+=POPUPDIVPENALTY
+------------------------------*/
+
+#popUpDivPenalty {
+	position:absolute;
+	background-color:#eeeeee;
+	width:350px;
+	height:350px;
+	z-index: 9002;
+}
+
+	#popUpDivPenalty button {
+			width: 35px;
+	}
+	
+		#popUpDivPenalty input[type=text] {
+		width: 70px;
+		vertical-align:bottom;
+		height: 35px;
+		font-size:25px
+	}
+
+		#popUpDivPenalty input[type=button] {
+			width:5em;
+			height:3em;
+			background-color: #A9A9A9;
+		}
+			#popUpDivPenalty input[type=button].selected {
+				width:5em;
+				height:3em;
+				background-color: #FFFFFF;
+			}
+
+#popUp {
+	position:left;
+	padding-left: 40px;
+}
+
+/*------------------------------
+=CONTENT AREA
 ------------------------------*/
 
 #content {
@@ -148,7 +183,7 @@ nav {
 
 	#mainContent {
 		display: table-cell;
-		width: 500px;
+		width: 600px;
 		padding-right: 22px;
 		padding left:  22px;
 	}
@@ -183,11 +218,12 @@ nav {
 		}
 
 /*------------------------------
-=HOMETEAM style="background-color:#EEEEEE;height:400px;width:400px;float:left;"
+=HOMETEAM
 ------------------------------*/
 
 #hometeam {
 	float:left;
+	padding-left: 45px;
 	height:400px;
 	width:225px;
 	text-align:center;
@@ -205,7 +241,7 @@ nav {
 	
 		
 /*------------------------------
-=AWAYTEAM style="background-color:#777777;height:400px;width:400px;float:left;"
+=AWAYTEAM
 ------------------------------*/
 
 #awayteam {

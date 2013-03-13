@@ -1,4 +1,3 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -15,18 +14,47 @@
 </head>
 <body>
 <div id="blanket" style="display:none;"></div>
-<div id="popUpDiv" style="display:none;">
-	<h3> Enter the player's number and press the appropriate shot button. </h3>
+<div id="popUpDivShot" style="display:none;">
+	<h3> Enter the player's number and press the appropriate team. </h3>
 	<div id="popUp">
-		<input type="button" value="Home" onclick="HomeShot('popUpDiv', 'logShot');">
+		<input type="button" value="Home" onclick="HomeShot('popUpDivShot','logShot');">
 		<input id="logShot" type="text" value="" maxlength="2">
-		<input type="button" value="Away" onclick="AwayShot('popUpDiv', 'logShot');">
+		<input type="button" value="Away" onclick="AwayShot('popUpDivShot','logShot');">
+		<br><input type="button" value="Cancel" onclick="popup('popUpDivShot');">
+	</div>
+</div>
+<div id="popUpDivGoal" style="display:none;">
+	<h3> Enter the scoring info and press the approriate team. </h3>
+	<div id="popUp">
+		<input type="button" value="Home" onclick="HomeGoal('popUpDivGoal','Scorer','Assist1','Assist2');">
+		<input type="button" value="Away" onclick="AwayGoal('popUpDivGoal','Scorer','Assist1','Assist2');">
+		<input type="button" value="Cancel" onclick="popup('popUpDivGoal');">
+		<br>Scorer<br><input id="Scorer" type="text" value="" maxlength="2">
+		<br>First Assist<br><input id="Assist1" type="text" value="" maxlength="2">
+		<br>Second Assist<br><input id="Assist2" type="text" value="" maxlength="2">
+
+
 	</div>
 </div>	
+<div id="popUpDivPenalty" style="display:none;">
+	<h3> Enter the penalty info and press the appropriate team. </h3>
+	<div id="popUp">
+		<input type="button" value="Home" onclick="HomePenalty('popUpDivPenalty','Player','Penalty','Length','Coincidental','Major');"> 
+		<input type="button" value="Away" onclick="AwayPenalty('popUpDivPenalty','Player','Penalty','Length','Coincidental','Major');">
+		<input type="button" value="Cancel" onclick="popup('popUpDivPenalty');">
+		<br>Player (ex: 36)<br><input id="Player" type="text" value="" maxlength="2">
+		<br>Penalty (ex: Roughing)<br><input id="Penalty" type="text" value="" maxlength="20">
+		<br>Time (ex: 2)<br><input id="Length" type="text" value="" maxlength="2">
+		<br>Coincidental  (check for yes)<input type="checkbox" id="Coincidental" value="Coincidental">
+		<br>Major Penalty (check for yes)<input type="checkbox" id="Major" value="Major">
+	</div>
+</div>		
 <div id="content">
 	<div id="mainContent">
         <div id="timer">
-	<input type="button" value="Shot" onclick="shot('popUpDiv');">
+	<input type="button" value="Shot" onclick="shot('popUpDivShot');">
+	<input type="button" value="Goal" onclick="goal('popUpDivGoal');">
+	<input type="button" value="Penalty" onclick="penalty('popUpDivPenalty');">
         <input id="time" type="text" value="20:00" maxlength="5">
         <input type="button" value="Start" onclick="StartTime('time',true);">
         <input type="button" value="Stop" onclick="StartTime('time',false);">

@@ -2,7 +2,7 @@
 <html>
 <head>
 <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
-<script src="epochUtils.js"></script>
+<script src="/epochUtils.js"></script>
 <title>Hockey Game Manager</title>
 <meta charset="UTF-8" />
 <link rel="stylesheet" type="text/css" href="reset.css">
@@ -93,21 +93,21 @@ $(document).ready(function() {
 					{
 						target.options[count] = null;
 					}
-						
+
 					var away_id = data["awayTeam"]; 
 					$.getJSON("/teams/"+away_id+"/get-roster", function(data,status) 
 					{							
 						target.options[target.options.length]=new Option("=="+team_names[away_id]+"==");
 						
-						for (var i = 0; i < data["data"].length; i++) { 
-							var name = data["data"][i]["name"];
-							while (name < 30) name += " ";
-							var pos = data["data"][i]["position"];
-							var num = data["data"][i]["number"];
-							var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
-							target.options[target.options.length]=new Option(str);
-							players_ids[str] = data["data"][i]["id"];
-						}
+for (var i = 0; i < data["data"].length; i++) { 
+	var name = data["data"][i]["name"];
+	while (name < 30) name += " ";
+	var pos = data["data"][i]["position"];
+	var num = data["data"][i]["number"];
+	var str = "#"+num + " " + name + "\t\t" + "("+pos+")";
+	target.options[target.options.length]=new Option(str);
+	players_ids[str] = data["data"][i]["id"];
+}
 																
 					});		 						
 						
@@ -132,6 +132,10 @@ $(document).ready(function() {
 			}	
 		}
   	});
+        $("#selectPlayer").on("change", function() { 
+                var player = $("option:selected", this);
+                console.log(players_ids[player]);
+        });
 });	
 
 window.onload=function() {

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="http://code.jquery.com/jquery-1.9.0.min.js"></script>
+    <script src="/epochUtils.js"></script>
+    <title>game maker</title>
+    <meta charset="UTF-8" />
+    <script>
+      $(document).ready(function() {
+        $.getJSON("/teams", function(data) {
+          var teams = data.data;
+          var home = document.getElementById("home");
+          var away = document.getElementById("away");
+          for (var i = 0; i < teams.length; i++) {
+            home.options[i] = new Option(teams[i].name, teams[i].id);
+            away.options[i] = new Option(teams[i].name, teams[i].id);
+          }
+        });
+        $("#create").submit(function() {
+          var homeId = $("#home").val();
+          var awayId = $("#away").val();
+          var date = $("#date").val();
+          var time = $("#time").val();
+          var ts = Math.round(Date.parse(date+" "+time, "yyyy-MM-dd HH:mm") 
+                              / 1000);
+          $.post("/games", {home: homeId, away: awayId, startTime:
+                              ts}, "json").fail(function (e) { console.log(e); });
+
+          return false;
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <h1>game maker</h1>
+    <form id="create">
+      <select name="home" id="home">
+      </select>
+      <select name="away" id="away">
+      </select>
+      <input type="date" id="date">
+      <input type="time" id="time">
+      <input type="submit" value="Create!">
+    </form>
+  </body>
+</html>
