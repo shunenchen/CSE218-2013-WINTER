@@ -50,7 +50,7 @@
 (defn create-user
   "m is a map with an :identity key. Returns the user."
   [m]
-    (let [u (assoc m :roles #{:official})]
+    (let [u (assoc m :roles #{:fan})]
       (with-client client
         (put-item userTable
           {:id (:identity u)
