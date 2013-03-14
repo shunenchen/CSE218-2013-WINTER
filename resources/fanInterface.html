@@ -371,8 +371,18 @@ function teamResultsOverlay()
 	var source = document.getElementById('team_search');
 	for(var i=(source.options.length-1); i>=0; i--){
 			if(source.options[i].selected && i != 0){	
-				var popup_content = "<div><h1>"+source.options[i].text+"</h1></div>";
-				$.modal(popup_content, {overlayClose:true});	
+				$.getJSON("/teams/"+teams_search_id_results[i]+"/get-roster", function(data,status) 
+				{		
+					var popup_content = "<div><h1>==ROSTER==</h1>";
+					
+					for (var j = 0; j < data["data"].length; j++)							
+						popup_content += "</br>"+data["data"][j]["name"];	
+					//popup_content += "</br>Hits:          \t\t" + data["hits"];
+					
+					popup_content += "</div>"	
+					
+					$.modal(popup_content, {overlayClose:true});														
+				});		 
 				source.options[i].selected = false;	
 			}
 	}
