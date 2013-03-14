@@ -13,7 +13,7 @@
 var DataToShow = { 
 	SHOW_GAME_EVENTS	: 0, 
 	SHOW_PLAYER_STATS	: 1, 
-	SHOW_TEAMS_STATS	: 2, 
+	SHOW_TEAMS_ROSTERS	: 2, 
 	SHOW_SEARCH			: 3
 	};
 
@@ -21,6 +21,9 @@ var games_ids = {};
 var players_ids = {};
 var team_names = {};
 var currently_showing = DataToShow.SHOW_GAME_EVENTS;
+
+var away_roster_ids = {};
+var home_roster_ids = {};
 
 var uuid_to_player = {};
 
@@ -45,6 +48,10 @@ $(document).ready(function() {
 						players_ids[target.options.length]=0;
 						target.options[target.options.length]=new Option("=="+team_names[away_id]+"==");
 						
+						roster = document.getElementById('away_roster');
+						for (var r = 0; r < roster.length; r++) roster.options[r] = null;			
+						roster.options[0]=new Option("==Away Team Roster==");
+						
 						for (var i = 0; i < data["data"].length; i++) { 
 							var name = data["data"][i]["name"];							
 							//while (name.length < 40) name += " ";
@@ -56,6 +63,9 @@ $(document).ready(function() {
 							players_ids[target.options.length] = data["data"][i]["id"];
                             uuid_to_player[data.data[i].id] = str;
 							target.options[target.options.length]=new Option(str);
+							
+							away_roster_ids[roster.options.length] = data["data"][i]["id"];
+							roster.options[roster.options.length]=new Option(str);
 						}
 						awayD.resolve();										
 					});		 						
@@ -65,6 +75,10 @@ $(document).ready(function() {
 					{							
 						players_ids[target.options.length]=0;
 						target.options[target.options.length]=new Option("=="+team_names[home_id]+"==");
+						
+						roster = document.getElementById('home_roster');
+						for (var r = 0; r < roster.length; r++) roster.options[r] = null;			
+						roster.options[0]=new Option("==Home Team Roster==");
 						
 						for (var i = 0; i < data["data"].length; i++) { 
 							var name = data["data"][i]["name"];
@@ -77,7 +91,10 @@ $(document).ready(function() {
 							players_ids[target.options.length] = data["data"][i]["id"];	
                                                         uuid_to_player[data.data[i].id] = str;
 							//console.log(players_ids[target.options.length]);
-							target.options[target.options.length]=new Option(str);							
+							target.options[target.options.length]=new Option(str);	
+							
+							home_roster_ids[roster.options.length] = data["data"][i]["id"];
+							roster.options[roster.options.length]=new Option(str);						
 						}
                                                 homeD.resolve();
 					});		 													
@@ -195,8 +212,8 @@ window.onload=function() {
 	document.getElementById('event-box').value = "";	
 	document.getElementById('career-stats').value = "== CAREER STATS ==";
 	document.getElementById('game-stats').value = "== GAME STATS ==";
-	document.getElementById('home-stats').value = "== HOME STATS ==";
-	document.getElementById('away-stats').value = "== AWAY STATS ==";
+	document.getElementById('home_roster').value = "== HOME STATS ==";
+	document.getElementById('away_roster').value = "== AWAY STATS ==";
 
 	$.getJSON("/games", function(data,status) 	
 	{		
@@ -229,7 +246,7 @@ function setupPage(dataToShow) {
 	{
 		showing_game_events = true;
 		$('.player_events_div').hide();
-		$('.teams_stats_div').hide();
+		$('.teams_rosters_div').hide();
 		$('.game_stats_div').show();
 		$('.games_content').show();
 		$('.search_content').hide();
@@ -238,20 +255,20 @@ function setupPage(dataToShow) {
 	else if (dataToShow === DataToShow.SHOW_PLAYER_STATS && currently_showing !== DataToShow.SHOW_PLAYER_STATS)
 	{
 		$('.game_stats_div').hide();
-		$('.teams_stats_div').hide();
+		$('.teams_rosters_div').hide();
 		$('.player_events_div').show();
 		$('.games_content').show();
 		$('.search_content').hide();
 		currently_showing = DataToShow.SHOW_PLAYER_STATS;
 	}
-	else if (dataToShow === DataToShow.SHOW_TEAMS_STATS && currently_showing !== DataToShow.SHOW_TEAMS_STATS)
+	else if (dataToShow === DataToShow.SHOW_TEAMS_ROSTERS && currently_showing !== DataToShow.SHOW_TEAMS_ROSTERS)
 	{
 		$('.game_stats_div').hide();
-		$('.teams_stats_div').show();
+		$('.teams_rosters_div').show();
 		$('.player_events_div').hide();		
 		$('.games_content').show();
 		$('.search_content').hide();
-		currently_showing = DataToShow.SHOW_TEAMS_STATS;
+		currently_showing = DataToShow.SHOW_TEAMS_ROSTERS;
 	}
 	else if (dataToShow === DataToShow.SHOW_SEARCH && currently_showing !== DataToShow.SHOW_SEARCH)
 	{	
@@ -357,6 +374,91 @@ function teamResultsOverlay()
 	}
 }
 
+function homeRosterOverlay()
+{
+	//console.log("playerResultsOverlay");
+	
+	var source = document.getElementById('home_roster');
+	for(var i=(source.options.length-1); i>=0; i--){
+		if(source.options[i].selected && i != 0){	
+			var id = home_roster_ids[i];
+			$.getJSON("/players/"+id+"/stats", function(data,status) 
+			{							
+				var popup_content = "<div>";	
+				popup_content += "<h1>== CAREER STATS ==</h1>";
+				popup_content += "Goals:       \t\t" + data["goals"];		
+				popup_content += "</br>Assists:     \t\t" + data["assists"];	
+				popup_content += "</br>Plus Minus:  \t\t" + data["plus-minus"];		
+				popup_content += "</br>Shots:       \t\t" + data["shots"];	
+				//popup_content += "</br>Hits:          \t\t" + data["hits"];
+				
+				sel_game = document.getElementById('selectGame');
+		
+				for(var s=(sel_game.options.length-1); s>=0; s--){
+					if(sel_game.options[s].selected){		
+						$.getJSON("/players/"+id+"/stats/for-game/"+games_ids[sel_game.options[s].text], function(data,status) 
+						{							
+							popup_content += "</br><h1>== GAME STATS ==</h1>";
+							popup_content += "Goals:       \t\t" + data["goals"];		
+							popup_content += "</br>Assists:     \t\t" + data["assists"];	
+							popup_content += "</br>Plus Minus:  \t\t" + data["plus-minus"];		
+							popup_content += "</br>Shots:       \t\t" + data["shots"];	
+							//popup_content += "</br>Hits:          \t\t" + data["hits"];
+							
+							popup_content += "</div>"	
+							$.modal(popup_content, {overlayClose:true});						
+						});		
+					}
+				}
+			});
+			
+			source.options[i].selected = false;	
+		}
+	}
+}
+
+function awayRosterOverlay()
+{
+	//console.log("playerResultsOverlay");
+	
+	var source = document.getElementById('away_roster');
+	for(var i=(source.options.length-1); i>=0; i--){
+		if(source.options[i].selected && i != 0){	
+			var id = away_roster_ids[i];
+			$.getJSON("/players/"+id+"/stats", function(data,status) 
+			{							
+				var popup_content = "<div>";	
+				popup_content += "<h1>== CAREER STATS ==</h1>";
+				popup_content += "Goals:       \t\t" + data["goals"];		
+				popup_content += "</br>Assists:     \t\t" + data["assists"];	
+				popup_content += "</br>Plus Minus:  \t\t" + data["plus-minus"];		
+				popup_content += "</br>Shots:       \t\t" + data["shots"];	
+				//popup_content += "</br>Hits:          \t\t" + data["hits"];
+				
+				sel_game = document.getElementById('selectGame');
+		
+				for(var s=(sel_game.options.length-1); s>=0; s--){
+					if(sel_game.options[s].selected){		
+						$.getJSON("/players/"+id+"/stats/for-game/"+games_ids[sel_game.options[s].text], function(data,status) 
+						{							
+							popup_content += "</br><h1>== GAME STATS ==</h1>";
+							popup_content += "Goals:       \t\t" + data["goals"];		
+							popup_content += "</br>Assists:     \t\t" + data["assists"];	
+							popup_content += "</br>Plus Minus:  \t\t" + data["plus-minus"];		
+							popup_content += "</br>Shots:       \t\t" + data["shots"];	
+							//popup_content += "</br>Hits:          \t\t" + data["hits"];
+							
+							popup_content += "</div>"	
+							$.modal(popup_content, {overlayClose:true});						
+						});		
+					}
+				}
+			});
+			
+			source.options[i].selected = false;	
+		}
+	}
+}
 </script>
 
 </head>
@@ -374,7 +476,7 @@ function teamResultsOverlay()
             <button type="submit" id="show-event" class="btn" style="visibility: visible">Update</button>
         
         	</br> 
-            <a onClick=setupPage(DataToShow.SHOW_GAME_EVENTS)>Game Events</a>  |  <a onClick=setupPage(DataToShow.SHOW_PLAYER_STATS)>Player Stats</a>  |  <a onClick=setupPage(DataToShow.SHOW_TEAMS_STATS)>Teams Stats</a>
+            <a onClick=setupPage(DataToShow.SHOW_GAME_EVENTS)>Game Events</a>  |  <a onClick=setupPage(DataToShow.SHOW_PLAYER_STATS)>Player Stats</a>  |  <a onClick=setupPage(DataToShow.SHOW_TEAMS_ROSTERS)>Teams Rosters</a>
             
             <div class="game_stats_div">
                 <textarea readonly id="event-box" rows="4" style="width: 940px; height: 440px; margin-top: 10px; resize: none;">
@@ -394,13 +496,13 @@ Career Stats:
                 </textarea>        
             </div>
             
-            <div class="teams_stats_div">             	
-                <textarea readonly id="away-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
-Away Team Stats:
-                </textarea>   
-                <textarea readonly id="home-stats" rows="4" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
-Home Team Stats:
-                </textarea>        
+            <div class="teams_rosters_div">             	
+                <select id="away_roster" size="4" onclick="awayRosterOverlay()" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
+				<option>==Away Team Roster==</option>
+                </select>
+                <select id="home_roster" size="4" onclick="homeRosterOverlay()" style="width: 465px; height: 440px; margin-top: 10px; resize: none;">
+				<option>==Home Team Roster==</option>
+                </select>        
             </div>
 	</content>
     
