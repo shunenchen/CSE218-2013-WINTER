@@ -89,6 +89,7 @@ $(document).ready(function() {
 
 
             // generate tr
+            target.append("<tr><td>Forwards</td></tr>");
             var tr = $("<tr></tr>");
             var forwards = $.grep(AWAY.players, function (e) { return e.position === "forward"; });
             var defense = $.grep(AWAY.players, function (e) { return e.position === "defender"; });
@@ -102,6 +103,7 @@ $(document).ready(function() {
                 }
             }
             target.append(tr);
+            target.append("<tr><td>Defense</td></tr>");
             tr = $("<tr></tr>");
             for (var i = 0; i < defense.length; i++) {
                 tr.append("<td><input type=\"button\" value=\""+defense[i].number+"\" id=\""+defense[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'away')\"></td>");
@@ -111,6 +113,7 @@ $(document).ready(function() {
                 }
             }
             target.append(tr);
+            target.append("<tr><td>Goalies</td></tr>");
             tr = $("<tr></tr>");
             for (var i = 0; i < goalies.length; i++) {
                 tr.append("<td><input type=\"button\" value=\""+goalies[i].number+"\" id=\""+goalies[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'away')\"></td>");
@@ -129,6 +132,7 @@ $(document).ready(function() {
             HOME.players = data.data;
 
             // generate tr
+            target.append("<tr><td>Forwards</td></tr>");
             var tr = $("<tr></tr>");
             var forwards = $.grep(HOME.players, function (e) { return e.position === "forward"; });
             var defense = $.grep(HOME.players, function (e) { return e.position === "defender"; });
@@ -142,6 +146,7 @@ $(document).ready(function() {
                 }
             }
             target.append(tr);
+              target.append("<tr><td>Defense</td></tr>");
             tr = $("<tr></tr>");
             for (var i = 0; i < defense.length; i++) {
                 tr.append("<td><input type=\"button\" value=\""+defense[i].number+"\" id=\""+defense[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'home')\"></td>");
@@ -151,6 +156,7 @@ $(document).ready(function() {
                 }
             }
             target.append(tr);
+            target.append("<tr><td>Goalies</td></tr>");
             tr = $("<tr></tr>");
             for (var i = 0; i < goalies.length; i++) {
                 tr.append("<td><input type=\"button\" value=\""+goalies[i].number+"\" id=\""+goalies[i].id+"\" class=\"unselected\" onclick=\"SelectPlayer(id, 'home')\"></td>");
