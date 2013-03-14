@@ -29,7 +29,7 @@ var uuid_to_player = {};
 
 $(document).ready(function() {
   	$("#show-event").click(function() {
-		source = document.getElementById('selectGame');
+		source = document.getElementById('selectGame');		
 		
 		for(var i=(source.options.length-1); i>=0; i--){
 			if(source.options[i].selected){		
@@ -40,17 +40,19 @@ $(document).ready(function() {
 					for(var count = target.options.length - 1; count >= 0; count--)
 					{
 						target.options[count] = null;
-					}
+					}					
+						
 
 					var away_id = data["awayTeam"]; 
 					$.getJSON("/teams/"+away_id+"/get-roster", function(data,status) 
 					{							
 						players_ids[target.options.length]=0;
 						target.options[target.options.length]=new Option("=="+team_names[away_id]+"==");
-						
-						roster = document.getElementById('away_roster');
-						for (var r = 0; r < roster.length; r++) roster.options[r] = null;			
-						roster.options[0]=new Option("==Away Team Roster==");
+								
+						var away_roster = document.getElementById('away_roster');
+						while (away_roster.length != 1)
+							for (var r = 0; r < away_roster.length; r++) away_roster.options[r] = null;
+						away_roster.options[0]=new Option("==Away Team Roster==");
 						
 						for (var i = 0; i < data["data"].length; i++) { 
 							var name = data["data"][i]["name"];							
@@ -64,8 +66,8 @@ $(document).ready(function() {
                             uuid_to_player[data.data[i].id] = str;
 							target.options[target.options.length]=new Option(str);
 							
-							away_roster_ids[roster.options.length] = data["data"][i]["id"];
-							roster.options[roster.options.length]=new Option(str);
+							away_roster_ids[away_roster.options.length] = data["data"][i]["id"];
+							away_roster.options[away_roster.options.length]=new Option(str);
 						}
 						awayD.resolve();										
 					});		 						
@@ -76,11 +78,13 @@ $(document).ready(function() {
 						players_ids[target.options.length]=0;
 						target.options[target.options.length]=new Option("=="+team_names[home_id]+"==");
 						
-						roster = document.getElementById('home_roster');
-						for (var r = 0; r < roster.length; r++) roster.options[r] = null;			
-						roster.options[0]=new Option("==Home Team Roster==");
+						var home_roster = document.getElementById('home_roster');
+						while (home_roster.length != 1)
+							for (var r = 0; r < home_roster.length; r++) home_roster.options[r] = null;
+						home_roster.options[0]=new Option("==Home Team Roster==");
 						
 						for (var i = 0; i < data["data"].length; i++) { 
+							//console.log(home_roster.length);
 							var name = data["data"][i]["name"];
 							//while (name.length < 40) name += " ";
 							var pos = "("+data["data"][i]["position"]+")";
@@ -93,8 +97,8 @@ $(document).ready(function() {
 							//console.log(players_ids[target.options.length]);
 							target.options[target.options.length]=new Option(str);	
 							
-							home_roster_ids[roster.options.length] = data["data"][i]["id"];
-							roster.options[roster.options.length]=new Option(str);						
+							home_roster_ids[home_roster.options.length] = data["data"][i]["id"];
+							home_roster.options[home_roster.options.length]=new Option(str);													
 						}
                                                 homeD.resolve();
 					});		 													
