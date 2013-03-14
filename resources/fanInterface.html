@@ -141,7 +141,7 @@ $(document).ready(function() {
 							else if ("shot" === data["events"][i]["type"])
 								target.value += "Shot by " + uuid_to_player[data["events"][i]["playerId"]] + "\t";	
 							else if ("penalty" === data["events"][i]["type"])
-								target.value += data["events"][i]["penalty"] + "\t";	
+								target.value += data["events"][i]["penalty"] + "\t\t" + uuid_to_player[data["events"][i]["playerId"]] + "\t";	
 							//else if ("HIT" === data["events"][i]["type"])
 							//	target.value += data["events"][i]["info"] + "\t";
 							//else if ("ASSIST" === data["events"][i]["type"])
